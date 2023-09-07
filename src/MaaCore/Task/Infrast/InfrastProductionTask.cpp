@@ -241,9 +241,13 @@ bool asst::InfrastProductionTask::shift_facility_list()
             // 筛选第一个满足要求的干员组
             for (auto it = current_room_config().operator_groups.begin();
                  it != current_room_config().operator_groups.end(); it++) {
+                if (ranges::all_of(it->second, [oper_list](std::string& oper) { return oper_list.contains(oper); })) {
+                    current_room_config().names.insert(current_room_config().names.end(), it->second.begin(),
+                                                       it->second.end());
 
-                if (ranges::all_of(*it, [oper_list](std::string& oper) { return oper_list.contains(oper); })) {
-                    current_room_config().names.insert(current_room_config().names.end(), it->begin(), it->end());
+                    json::value sanity_info = basic_info_with_what("CustomInfrastRoomGroupsMatch");
+                    sanity_info["details"]["group"] = it->first;
+                    callback(AsstMsg::SubTaskExtraInfo, sanity_info);
                     break;
                 }
             }

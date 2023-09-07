@@ -19,6 +19,46 @@ bool asst::InfrastControlTask::_run()
         return false;
     }
 
+    // 如果是使用了编队组来排班
+    if (current_room_config().use_operator_groups) {
+        current_room_config().names.clear();
+        int swipe_times = 0;
+
+        std::set<std::string> oper_list;
+        std::vector<std::string> temp, pre_temp;
+        while (true) {
+            if (need_exit()) {
+                return false;
+            }
+            temp.clear();
+            if (!get_opers(temp, m_mood_threshold)) {
+                return false;
+            }
+            if (pre_temp == temp) {
+                break;
+            }
+            oper_list.insert(temp.begin(), temp.end());
+            pre_temp = temp;
+            swipe_of_operlist();
+            swipe_times++;
+        }
+        swipe_to_the_left_of_operlist(swipe_times + 1);
+        swipe_times = 0;
+        // 筛选第一个满足要求的干员组
+        for (auto it = current_room_config().operator_groups.begin(); it != current_room_config().operator_groups.end();
+             it++) {
+            if (ranges::all_of(it->second, [oper_list](std::string& oper) { return oper_list.contains(oper); })) {
+                current_room_config().names.insert(current_room_config().names.end(), it->second.begin(),
+                                                   it->second.end());
+
+                json::value sanity_info = basic_info_with_what("CustomInfrastRoomGroupsMatch");
+                sanity_info["details"]["group"] = it->first;
+                callback(AsstMsg::SubTaskExtraInfo, sanity_info);
+                break;
+            }
+        }
+    }
+
     for (int i = 0; i <= OperSelectRetryTimes; ++i) {
         if (need_exit()) {
             return false;
