@@ -34,8 +34,8 @@ RegionOCRer::ResultOpt RegionOCRer::analyze() const
 
     if (m_normalize) {
         cv::Mat mask = cv::Mat::zeros(m_image.size(), CV_8UC1);
-        mask(make_rect<cv::Rect>(new_roi)).setTo(255);
-        
+        mask(make_rect<cv::Rect>(correct_rect(new_roi, mask))).setTo(1);
+
         cv::normalize(m_image, m_image, 255.0, 0.0, cv::NormTypes::NORM_MINMAX, -1, mask);
         cv::normalize(m_image_draw, m_image_draw, 255.0, 0.0, cv::NormTypes::NORM_MINMAX, -1, mask);
     }
