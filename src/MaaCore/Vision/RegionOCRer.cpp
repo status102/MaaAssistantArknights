@@ -32,6 +32,14 @@ RegionOCRer::ResultOpt RegionOCRer::analyze() const
         new_roi.height += 2 * exp;
     }
 
+    if (m_normalize) {
+        cv::Mat mask = cv::Mat::zeros(m_image.size(), CV_8UC1);
+        mask(make_rect<cv::Rect>(new_roi)).setTo(255);
+        
+        cv::normalize(m_image, m_image, 255.0, 0.0, cv::NormTypes::NORM_MINMAX, -1, mask);
+        cv::normalize(m_image_draw, m_image_draw, 255.0, 0.0, cv::NormTypes::NORM_MINMAX, -1, mask);
+    }
+
 #ifdef ASST_DEBUG
     cv::rectangle(m_image_draw, make_rect<cv::Rect>(new_roi), cv::Scalar(0, 0, 255), 1);
 #endif // ASST_DEBUG
