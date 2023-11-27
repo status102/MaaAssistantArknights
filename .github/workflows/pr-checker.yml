@@ -1,4 +1,4 @@
-name: Check PR Commit Names
+name: PR Checker
 
 on:
   pull_request:
@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Check PR Commits
-        id: check
+      - name: No Merge Commit
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
