@@ -7,15 +7,6 @@ endif ()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-option(BUILD_TEST "build a demo" OFF)
-option(BUILD_XCFRAMEWORK "build xcframework for macOS app" OFF)
-option(BUILD_UNIVERSAL "build both arm64 and x86_64 on macOS" OFF)
-option(INSTALL_PYTHON "install python ffi" OFF)
-option(INSTALL_RESOURCE "install resource" OFF)
-option(INSTALL_DEVEL "install development files" OFF)
-option(INSTALL_THIRD_LIBS "install third party libraries" ON)
-option(USE_MAADEPS "use third-party libraries built by MaaDeps" ON)
-option(WITH_THRIFT "build with thrift" OFF)
 
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/thrift-gen.cmake)
