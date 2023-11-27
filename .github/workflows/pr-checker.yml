@@ -23,7 +23,7 @@ jobs:
             });
             
             const regex = /^Merge/;
-            const invalidCommits = commits.filter(commit => !regex.test(commit.commit.message));
+            const invalidCommits = commits.filter(commit => regex.test(commit.commit.message));
             
             if (invalidCommits.length > 0) {
               console.log(invalidCommits);
