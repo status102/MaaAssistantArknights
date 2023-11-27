@@ -25,6 +25,7 @@ jobs:
             const invalidCommits = commits.filter(commit => !regex.test(commit.commit.message));
             
             if (invalidCommits.length > 0) {
+              console.log(invalidCommits);
               const invalidCommitNames = invalidCommits.map(commit => commit.commit.message);
               core.setFailed(`Invalid commit names found: ${invalidCommitNames.join(", ")}`);
             }
