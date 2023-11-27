@@ -3,6 +3,8 @@ name: Check PR Commit Names
 on:
   pull_request:
     types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
 
 jobs:
   check_commits:
