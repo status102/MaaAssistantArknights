@@ -734,6 +734,7 @@ bool asst::AdbController::connect(const std::string& adb_path, const std::string
     m_adb.start = cmd_replace(adb_cfg.start);
     m_adb.stop = cmd_replace(adb_cfg.stop);
     m_adb.back_to_home = cmd_replace(adb_cfg.back_to_home);
+    m_adb.send_text = cmd_replace("[Adb] -s [AdbSerial] shell input ");
 
     if (m_support_socket && !m_server_started) {
         std::string bind_address;
@@ -784,5 +785,11 @@ void asst::AdbController::clear_lf_info()
 void asst::AdbController::back_to_home() noexcept
 {
     call_command(m_adb.back_to_home);
+    return;
+}
+
+void asst::AdbController::send_text(const std::string& text) noexcept
+{
+    call_command(m_adb.send_text + " text \"" + text + "\"");
     return;
 }

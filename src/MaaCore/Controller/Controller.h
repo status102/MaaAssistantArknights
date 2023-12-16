@@ -64,6 +64,7 @@ namespace asst
         bool inject_input_event(InputEvent& event);
 
         bool press_esc();
+        bool send_text(const std::string& text);
         ControlFeat::Feat support_features();
 
         std::pair<int, int> get_scale_size() const noexcept;

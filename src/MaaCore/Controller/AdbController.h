@@ -50,6 +50,7 @@ namespace asst
         AdbController& operator=(AdbController&&) = delete;
 
         virtual void back_to_home() noexcept override;
+        virtual void send_text(const std::string& text) noexcept override;
 
     protected:
         std::optional<std::string> call_command(const std::string& cmd, int64_t timeout = 20000,
@@ -101,6 +102,7 @@ namespace asst
             std::string stop;
 
             std::string back_to_home;
+            std::string send_text;
 
             /* properties */
             enum class ScreencapEndOfLine

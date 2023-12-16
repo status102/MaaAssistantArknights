@@ -393,3 +393,8 @@ void asst::MinitouchController::back_to_home() noexcept
     AdbController::back_to_home();
     return;
 }
+
+void asst::MinitouchController::send_text(const std::string& text) noexcept
+{
+    AdbController::send_text(text);
+}

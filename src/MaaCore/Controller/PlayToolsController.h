@@ -48,6 +48,7 @@ namespace asst
         PlayToolsController& operator=(PlayToolsController&&) = delete;
 
         virtual void back_to_home() noexcept override;
+        virtual void send_text([[maybe_unused]] const std::string& text) noexcept override;
 
     protected:
         AsstCallback m_callback;

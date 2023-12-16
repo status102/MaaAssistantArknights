@@ -172,6 +172,11 @@ void asst::PlayToolsController::back_to_home() noexcept
     return;
 }
 
+void asst::PlayToolsController::send_text([[maybe_unused]]const std::string& text) noexcept
+{
+    Log.info("SendText is not supported on iOS");
+}
+
 bool asst::PlayToolsController::toucher_down(const Point& p, const int delay)
 {
     return toucher_commit(TouchPhase::Began, p, delay);

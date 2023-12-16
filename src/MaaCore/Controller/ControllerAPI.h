@@ -51,6 +51,7 @@ namespace asst
         ControllerAPI& operator=(ControllerAPI&&) = delete;
 
         virtual void back_to_home() noexcept {}
+        virtual void send_text(const std::string& text) noexcept = 0;
     };
 
     struct InputEvent

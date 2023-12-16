@@ -76,6 +76,12 @@ bool asst::Controller::back_to_home()
     return true;
 }
 
+bool asst::Controller::send_text(const std::string& text)
+{
+    m_controller->send_text(text);
+    return true;
+}
+
 cv::Mat asst::Controller::get_resized_image_cache() const
 {
     const static cv::Size d_size(m_scale_size.first, m_scale_size.second);

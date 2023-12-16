@@ -4,6 +4,7 @@
 
 #include "Config/TaskData.h"
 #include "Controller/Controller.h"
+#include "InstHelper.h"
 #include "Task/ProcessTask.h"
 #include "Utils/ImageIo.hpp"
 #include "Utils/Logger.hpp"
@@ -32,33 +33,30 @@ bool asst::AccountSwitchTask::_run()
     if (!navigate_to_start_page()) {
         return false;
     }
-    // 当前账号就是想要的
-    std::string current_account;
 
-    if (m_client_type == SupportedClientType[0]) {
-        current_account = get_current_account();
-    }
-    else if (m_client_type == SupportedClientType[1]) {
-        current_account = get_current_account_b();
-    }
+    std::string account_name;
+    std::string password;
 
-    if (current_account == m_account) {
-        return click_manager_login_button();
-    }
-    // 展开列表
-    show_account_list();
+    account_name = m_account.substr(0, m_account.find_first_of(','));
+    password = m_account.substr(m_account.find_first_of(',') + 1);
 
-    if (swipe_and_select() || swipe_and_select(true)) {
-        json::value info = basic_info_with_what("AccountSwitch");
-        info["details"]["current_account"] = current_account;
-        info["details"]["account_name"] = m_target_account;
-        callback(AsstMsg::SubTaskExtraInfo, info);
+    ctrler()->click({ 585, 490, 110, 20 });
+    sleep(500);
+    ctrler()->click({ 750, 555, 70, 20 });
+    sleep(500);
+    ctrler()->click({ 500, 260, 110, 20 });
+    sleep(500);
+    ctrler()->send_text(account_name);
+    sleep(2000);
+    ctrler()->click({ 500, 340, 110, 20 });
+    sleep(500);
+    ctrler()->send_text(password);
+    sleep(2000);
+    ctrler()->click({ 470, 410, 10, 10 });
+    sleep(500);
+    ctrler()->click({ 600, 500, 110, 20 });
 
-        return true;
-    }
-    else {
-        return false;
-    }
+    return true;
 }
 
 bool asst::AccountSwitchTask::navigate_to_start_page()
