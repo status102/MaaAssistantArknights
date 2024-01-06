@@ -672,7 +672,7 @@
     <ClInclude Include="Task\Miscellaneous\ScreenshotTaskPlugin.h">
       <Filter>Source\Task\Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="Task\Fight\FightTimesPlugin.h">
+    <ClInclude Include="Task\Fight\FightTimesTaskPlugin.h">
       <Filter>Source\Task\Fight</Filter>
     </ClInclude>
     <ClInclude Include="Task\Roguelike\RoguelikeSettlementTaskPlugin.h">
@@ -689,6 +689,9 @@
     </ClInclude>
     <ClInclude Include="Config\TaskData\TaskDataTypes.h">
       <Filter>Source\Resource\TaskData</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Fight\PRTSTaskPlugin.h">
+      <Filter>Source\Task\Fight</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1133,7 +1136,7 @@
     <ClCompile Include="Task\Fight\MedicineCounterPlugin.cpp">
       <Filter>Source\Task\Fight</Filter>
     </ClCompile>
-    <ClCompile Include="Task\Fight\FightTimesPlugin.cpp">
+    <ClCompile Include="Task\Fight\FightTimesTaskPlugin.cpp">
       <Filter>Source\Task\Fight</Filter>
     </ClCompile>
     <ClCompile Include="Task\Roguelike\RoguelikeSettlementTaskPlugin.cpp">
@@ -1147,6 +1150,9 @@
     </ClCompile>
     <ClCompile Include="Config\TaskData\TaskDataSymbolStream.cpp">
       <Filter>Source\Resource\TaskData</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Fight\PRTSTaskPlugin.cpp">
+      <Filter>Source\Task\Fight</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

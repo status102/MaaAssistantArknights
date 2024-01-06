@@ -10,6 +10,7 @@
 #include "Vision/Battle/BattlefieldClassifier.h"
 #include "Vision/Battle/BattlefieldMatcher.h"
 #include "Vision/Matcher.h"
+#include "Vision/MultiMatcher.h"
 #include "Vision/Miscellaneous/DepotImageAnalyzer.h"
 #include "Vision/Miscellaneous/StageDropsImageAnalyzer.h"
 
@@ -17,7 +18,10 @@ asst::DebugTask::DebugTask(const AsstCallback& callback, Assistant* inst) : Inte
 
 bool asst::DebugTask::run()
 {
-    test_drops();
+    auto img = imread(utils::path("D:/My_Program/Arknights/MaaAssistantArknights/tools/ImageCoordinate/Fight.png"));
+    MultiMatcher medicine_icon_matcher(img);
+    medicine_icon_matcher.set_task_info("FightSeries-MedicineIcon");
+    medicine_icon_matcher.analyze();
     return true;
 }
 

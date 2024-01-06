@@ -4101,6 +4101,29 @@
         ],
         "postDelay": 500
     },
+    "FightSeries-Times": {
+        "doc": "战斗中次数识别",
+        "algorithm": "OcrDetect",
+        "roi": [
+            740,
+            65,
+            15,
+            20
+        ]
+    },
+    "FightSeries-MedicineIcon": {
+        "templThreshold": 0.9,
+        "roi": [
+            980,
+            190,
+            50,
+            380
+        ],
+        "maskRange": [
+            1,
+            255
+        ]
+    },
     "FightSeries-List-1": {
         "algorithm": "JustReturn",
         "action": "ClickRect",

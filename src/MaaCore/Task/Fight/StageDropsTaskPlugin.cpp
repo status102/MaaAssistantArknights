@@ -12,6 +12,7 @@
 #include "Config/TaskData.h"
 #include "Controller/Controller.h"
 #include "Status.h"
+#include "Task/Fight/FightTimesTaskPlugin.h"
 #include "Task/ProcessTask.h"
 #include "Task/ReportDataTask.h"
 #include "Utils/Logger.hpp"
@@ -173,6 +174,14 @@ bool asst::StageDropsTaskPlugin::recognize_drops()
     m_cur_drops = analyzer.get_drops();
     m_times = analyzer.get_times();
 
+    if (m_times >= 0) {
+        for (const auto& plugin : m_task_ptr->get_plugins()) {
+            if (auto ptr = std::dynamic_pointer_cast<FightTimesTaskPlugin>(plugin)) {
+                ptr->finish_fight(m_times);
+            }
+        }
+    }
+
     if (!ret) {
         auto info = basic_info();
         info["subtask"] = "RecognizeDrops";
@@ -279,7 +288,7 @@ void asst::StageDropsTaskPlugin::set_start_button_delay()
 
     m_start_button_delay_is_set = true;
     Log.info(__FUNCTION__, "set StartButton2WaitTime post delay", delay);
-    m_cast_ptr->set_post_delay("StartButton2WaitTime", static_cast<int>(delay));
+    //m_cast_ptr->set_post_delay("StartButton2WaitTime", static_cast<int>(delay));
 }
 
 bool asst::StageDropsTaskPlugin::upload_to_server(const std::string& subtask, ReportType report_type)
