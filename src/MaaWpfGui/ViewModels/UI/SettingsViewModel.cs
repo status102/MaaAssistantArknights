@@ -422,7 +422,7 @@ namespace MaaWpfGui.ViewModels.UI
                 return;
             }
 
-            ConfigurationHelper.SetValue(ConfigurationKeys.Localization, SoberLanguage);
+            ConfigFactory.CurrentConfig.GUI.Localization = SoberLanguage;
             Hangover = true;
             Cheers = false;
         }
@@ -693,7 +693,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _minimizeDirectly = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeDirectly, bool.FalseString));
+        private bool _minimizeDirectly = ConfigFactory.CurrentConfig.GUI.MinimizeDirectly;
 
         /// <summary>
         /// Gets or sets a value indicating whether to minimize directly.
@@ -704,7 +704,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _minimizeDirectly, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.MinimizeDirectly, value.ToString());
+                ConfigFactory.CurrentConfig.GUI.MinimizeDirectly = value;
             }
         }
 
@@ -3423,7 +3423,7 @@ namespace MaaWpfGui.ViewModels.UI
         public bool UseTray => true;
         */
 
-        private bool _minimizeToTray = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeToTray, bool.FalseString));
+        private bool _minimizeToTray = ConfigFactory.CurrentConfig.GUI.MinimizeToTray;
 
         /// <summary>
         /// Gets or sets a value indicating whether to minimize to tray.
@@ -3434,7 +3434,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _minimizeToTray, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.MinimizeToTray, value.ToString());
+                ConfigFactory.CurrentConfig.GUI.MinimizeToTray = value;
                 Instances.MainWindowManager.SetMinimizeToTaskBar(value);
             }
         }
@@ -3709,7 +3709,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private string _language = ConfigurationHelper.GetValue(ConfigurationKeys.Localization, LocalizationHelper.DefaultLanguage);
+        private string _language = ConfigFactory.CurrentConfig.GUI.Localization;
 
         /// <summary>
         /// Gets or sets the language.
@@ -3736,7 +3736,7 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 // var backup = _language;
-                ConfigurationHelper.SetValue(ConfigurationKeys.Localization, value);
+                ConfigFactory.CurrentConfig.GUI.Localization = value;
 
                 var mainWindow = Application.Current.MainWindow;
 
@@ -3820,7 +3820,7 @@ namespace MaaWpfGui.ViewModels.UI
 
         private static void SetPallasLanguage()
         {
-            ConfigurationHelper.SetValue(ConfigurationKeys.Localization, PallasLangKey);
+            ConfigFactory.CurrentConfig.GUI.Localization = PallasLangKey;
             var result = MessageBoxHelper.Show(
                 LocalizationHelper.GetString("DrunkAndStaggering"),
                 LocalizationHelper.GetString("Burping"),

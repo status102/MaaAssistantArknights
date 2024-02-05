@@ -28,7 +28,7 @@ namespace MaaWpfGui.Helper
         private static readonly string _configurationFile = Path.Combine(Environment.CurrentDirectory, "config/gui.json");
         private static readonly ILogger _logger = Log.ForContext<ConfigurationHelper>();
 
-        public static bool Convert()
+        public static bool ConvertConfig()
         {
             if (Directory.Exists("config") is false)
             {
@@ -82,10 +82,15 @@ namespace MaaWpfGui.Helper
         {
             ConfigurationHelper.Load();
             ConfigFactory.CurrentConfig.GUI.Localization = ConfigurationHelper.GetValue(ConfigurationKeys.Localization, LocalizationHelper.DefaultLanguage);
+            ConfigFactory.CurrentConfig.GUI.LoadWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.LoadWindowPlacement, bool.TrueString));
+            ConfigFactory.CurrentConfig.GUI.SaveWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.SaveWindowPlacement, bool.TrueString));
+            ConfigFactory.CurrentConfig.GUI.MinimizeToTray = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeToTray, bool.FalseString));
+            ConfigFactory.CurrentConfig.GUI.MinimizeDirectly = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeDirectly, bool.FalseString));
+
+
             Task.Run(() => ConfigFactory.Save()).Wait();
             return true;
         }
-
         private static JObject ParseJsonFile(string filePath)
         {
             if (File.Exists(filePath) is false)

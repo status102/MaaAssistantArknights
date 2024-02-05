@@ -13,6 +13,7 @@
 // </copyright>
 
 using System.ComponentModel;
+using CalcBinding;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Models;
 
@@ -29,6 +30,8 @@ namespace MaaWpfGui.Configuration
         public string Localization { get; set; } = LocalizationHelper.DefaultLanguage;
 
         public bool MinimizeToTray { get; set; } = false;
+
+        public bool MinimizeDirectly { get; set; } = false;
 
         public bool HideCloseButton { get; set; } = false;
 
