@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using MaaWpfGui.Configuration;
 using MaaWpfGui.Constants;
 using MaaWpfGui.Extensions;
 using MaaWpfGui.Helper;
@@ -90,7 +91,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// </summary>
         public ObservableCollection<LogItemViewModel> LogItemViewModels { get; private set; }
 
-        private string _actionAfterCompleted = ConfigurationHelper.GetValue(ConfigurationKeys.ActionAfterCompleted, ActionType.DoNothing.ToString());
+        private ActionType _actionAfterCompleted = ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted;
 
         /// <summary>
         /// Gets or private sets the list of the actions after completion.
@@ -102,24 +103,20 @@ namespace MaaWpfGui.ViewModels.UI
         /// </summary>
         public ActionType ActionAfterCompleted
         {
-            get
-            {
-                return !Enum.TryParse(_actionAfterCompleted, out ActionType action) ? ActionType.DoNothing : action;
-            }
-
+            get => ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted;
             set
             {
-                string storeValue = value.ToString();
-                SetAndNotify(ref _actionAfterCompleted, storeValue);
+                SetAndNotify(ref _actionAfterCompleted, value);
 
                 if (value == ActionType.HibernateWithoutPersist ||
                     value == ActionType.ExitEmulatorAndSelfAndHibernateWithoutPersist ||
                     value == ActionType.ShutdownWithoutPersist)
                 {
-                    storeValue = ActionType.DoNothing.ToString();
                 }
-
-                ConfigurationHelper.SetValue(ConfigurationKeys.ActionAfterCompleted, storeValue);
+                else
+                {
+                    ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted = value;
+                }
             }
         }
 
@@ -659,8 +656,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// </summary>
         public const int SelectedAllWidthWhenBoth = 80;
 
-        private int _selectedAllWidth =
-            ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse" ? SelectedAllWidthWhenBoth : 85;
+        private int _selectedAllWidth = ConfigFactory.CurrentConfig.GUI.InverseClearMode == GUI.InverseClearType.ClearInverse ? SelectedAllWidthWhenBoth : 85;
 
         /// <summary>
         /// Gets or sets the width of "Select All".
@@ -671,7 +667,7 @@ namespace MaaWpfGui.ViewModels.UI
             set => SetAndNotify(ref _selectedAllWidth, value);
         }
 
-        private bool _showInverse = ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse";
+        private bool _showInverse = ConfigFactory.CurrentConfig.GUI.InverseClearMode == GUI.InverseClearType.ClearInverse;
 
         /// <summary>
         /// Gets or sets a value indicating whether "Select inversely" is visible.

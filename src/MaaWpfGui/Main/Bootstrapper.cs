@@ -141,8 +141,10 @@ namespace MaaWpfGui.Main
                     // ignored
                 }
             }
+
             ConfigurationConverter.ConvertConfig();
             base.OnStart();
+
             // ConfigurationHelper.Load();
             LocalizationHelper.Load();
             ETagCache.Load();

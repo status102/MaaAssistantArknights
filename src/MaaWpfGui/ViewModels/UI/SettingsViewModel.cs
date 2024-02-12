@@ -48,6 +48,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using Stylet;
+using static MaaWpfGui.Configuration.GUI;
 using ComboBox = System.Windows.Controls.ComboBox;
 using DarkModeType = MaaWpfGui.Configuration.GUI.DarkModeType;
 using Timer = System.Timers.Timer;
@@ -3644,18 +3645,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private enum InverseClearType
-        {
-            Clear,
-            Inverse,
-            ClearInverse,
-        }
-
-        private InverseClearType _inverseClearMode =
-            Enum.TryParse(ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, InverseClearType.Clear.ToString()),
-                out InverseClearType temp)
-                ? temp
-                : InverseClearType.Clear;
+        private InverseClearType _inverseClearMode = ConfigFactory.CurrentConfig.GUI.InverseClearMode;
 
         /// <summary>
         /// Gets or sets the inverse clear mode.
@@ -3671,7 +3661,7 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 SetAndNotify(ref _inverseClearMode, tempEnumValue);
-                ConfigurationHelper.SetValue(ConfigurationKeys.InverseClearMode, value);
+                ConfigFactory.CurrentConfig.GUI.InverseClearMode = tempEnumValue;
                 switch (tempEnumValue)
                 {
                     case InverseClearType.Clear:

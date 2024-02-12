@@ -19,6 +19,7 @@ using MaaWpfGui.Constants;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using static MaaWpfGui.ViewModels.UI.TaskQueueViewModel;
 
 namespace MaaWpfGui.Helper
 {
@@ -87,10 +88,30 @@ namespace MaaWpfGui.Helper
             ConfigFactory.CurrentConfig.GUI.MinimizeToTray = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeToTray, bool.FalseString));
             ConfigFactory.CurrentConfig.GUI.MinimizeDirectly = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeDirectly, bool.FalseString));
 
+            if (Enum.TryParse<ActionType>(ConfigurationHelper.GetValue(ConfigurationKeys.ActionAfterCompleted, ActionType.DoNothing.ToString()), true, out var ActionAfterCompletedResult))
+            {
+                ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted = ActionAfterCompletedResult;
+            }
+
+            if (ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse")
+            {
+                ConfigFactory.CurrentConfig.GUI.InverseClearMode = GUI.InverseClearType.ClearInverse;
+            }
+            else
+            {
+                if (!bool.TryParse(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString), out var result))
+                {
+                }
+                else
+                {
+                    ConfigFactory.CurrentConfig.GUI.InverseClearMode = result ? GUI.InverseClearType.Inverse : GUI.InverseClearType.Clear;
+                }
+            }
 
             Task.Run(() => ConfigFactory.Save()).Wait();
             return true;
         }
+
         private static JObject ParseJsonFile(string filePath)
         {
             if (File.Exists(filePath) is false)

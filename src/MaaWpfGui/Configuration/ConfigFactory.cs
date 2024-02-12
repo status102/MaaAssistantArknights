@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using MaaWpfGui.Helper;
 using ObservableCollections;
 using Serilog;
+using static MaaWpfGui.Configuration.SpecificConfig;
 
 [assembly: PropertyChanged.FilterType("MaaWpfGui.Configuration.")]
 namespace MaaWpfGui.Configuration
@@ -131,7 +132,7 @@ namespace MaaWpfGui.Configuration
                     keyValue.Value.GUI.PropertyChanged += OnPropertyChangedFactory(key);
                     keyValue.Value.DragItemIsChecked.CollectionChanged += OnCollectionChangedFactory<string, bool>(key + nameof(SpecificConfig.DragItemIsChecked) + ".");
                     keyValue.Value.InfrastOrder.CollectionChanged += OnCollectionChangedFactory<string, int>(key + nameof(SpecificConfig.InfrastOrder) + ".");
-                    keyValue.Value.TaskQueueOrder.CollectionChanged += OnCollectionChangedFactory<string, int>(key + nameof(SpecificConfig.TaskQueueOrder) + ".");
+                    keyValue.Value.TaskQueue.CollectionChanged += OnCollectionChangedFactory<BaseTask>(key + nameof(SpecificConfig.TaskQueue) + ".");
                 }
 
                 return parsed;
@@ -171,6 +172,14 @@ namespace MaaWpfGui.Configuration
             return (in NotifyCollectionChangedEventArgs<KeyValuePair<T1, T2>> args) =>
             {
                 OnPropertyChanged(key + args.NewItem.Key, null, args.NewItem.Value);
+            };
+        }
+
+        private static NotifyCollectionChangedEventHandler<T> OnCollectionChangedFactory<T>(string key)
+        {
+            return (in NotifyCollectionChangedEventArgs<T> args) =>
+            {
+                OnPropertyChanged(key + args.NewStartingIndex, null, args.NewItem);
             };
         }
 

@@ -16,6 +16,7 @@ using System.ComponentModel;
 using CalcBinding;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Models;
+using static MaaWpfGui.ViewModels.UI.TaskQueueViewModel;
 
 namespace MaaWpfGui.Configuration
 {
@@ -51,15 +52,11 @@ namespace MaaWpfGui.Configuration
 
         public bool CustomStageCode { get; set; } = false;
 
+        public ActionType ActionAfterCompleted { get; set; } = ActionType.DoNothing;
+
         public InverseClearType InverseClearMode { get; set; } = InverseClearType.Clear;
 
         public string WindowTitlePrefix { get; set; } = string.Empty;
-
-        // ReSharper disable once UnusedMember.Global
-        public void OnPropertyChanged(string propertyName, object before, object after)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventDetailArgs(propertyName, before, after));
-        }
 
         /// <summary>
         /// 表示深色模式的类型。
@@ -84,9 +81,26 @@ namespace MaaWpfGui.Configuration
 
         public enum InverseClearType
         {
+            /// <summary>
+            /// 清空
+            /// </summary>
             Clear = 0,
+
+            /// <summary>
+            /// 反选
+            /// </summary>
             Inverse,
+
+            /// <summary>
+            /// 二者可切
+            /// </summary>
             ClearInverse,
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public void OnPropertyChanged(string propertyName, object before, object after)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventDetailArgs(propertyName, before, after));
         }
     }
 }
