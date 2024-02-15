@@ -634,7 +634,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _inverseMode = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString));
+        private bool _inverseMode = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse;
 
         /// <summary>
         /// Gets or sets a value indicating whether to use inverse mode.
@@ -647,7 +647,7 @@ namespace MaaWpfGui.ViewModels.UI
                 SetAndNotify(ref _inverseMode, value);
                 InverseShowText = value ? LocalizationHelper.GetString("Inverse") : LocalizationHelper.GetString("Clear");
                 InverseMenuText = value ? LocalizationHelper.GetString("Clear") : LocalizationHelper.GetString("Inverse");
-                ConfigurationHelper.SetValue(ConfigurationKeys.MainFunctionInverseMode, value.ToString());
+                ConfigFactory.CurrentConfig.GUI.InverseClearShow = value ? GUI.InverseClearType.Inverse : GUI.InverseClearType.Clear;
             }
         }
 
@@ -678,7 +678,7 @@ namespace MaaWpfGui.ViewModels.UI
             set => SetAndNotify(ref _showInverse, value);
         }
 
-        private string _inverseShowText = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString))
+        private string _inverseShowText = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse
             ? LocalizationHelper.GetString("Inverse")
             : LocalizationHelper.GetString("Clear");
 
@@ -691,7 +691,7 @@ namespace MaaWpfGui.ViewModels.UI
             private set => SetAndNotify(ref _inverseShowText, value);
         }
 
-        private string _inverseMenuText = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString))
+        private string _inverseMenuText = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse
             ? LocalizationHelper.GetString("Clear")
             : LocalizationHelper.GetString("Inverse");
 

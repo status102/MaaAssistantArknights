@@ -56,6 +56,8 @@ namespace MaaWpfGui.Configuration
 
         public InverseClearType InverseClearMode { get; set; } = InverseClearType.Clear;
 
+        public InverseClearType InverseClearShow { get; set; } = InverseClearType.Clear;
+
         public string WindowTitlePrefix { get; set; } = string.Empty;
 
         /// <summary>
