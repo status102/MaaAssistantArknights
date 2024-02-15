@@ -49,6 +49,7 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using Stylet;
 using static MaaWpfGui.Configuration.GUI;
+using static MaaWpfGui.Configuration.VersionUpdate;
 using ComboBox = System.Windows.Controls.ComboBox;
 using DarkModeType = MaaWpfGui.Configuration.GUI.DarkModeType;
 using Timer = System.Timers.Timer;
@@ -2636,28 +2637,8 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        public enum UpdateVersionType
-        {
-            /// <summary>
-            /// 测试版
-            /// </summary>
-            Nightly,
-
-            /// <summary>
-            /// 开发版
-            /// </summary>
-            Beta,
-
-            /// <summary>
-            /// 稳定版
-            /// </summary>
-            Stable,
-        }
-
         /* 软件更新设置 */
-
-        private UpdateVersionType _versionType = (UpdateVersionType)Enum.Parse(typeof(UpdateVersionType),
-            ConfigurationHelper.GetValue(ConfigurationKeys.VersionType, UpdateVersionType.Stable.ToString()));
+        private UpdateVersionType _versionType = ConfigFactory.Root.VersionUpdate.VersionType;
 
         /// <summary>
         /// Gets or sets the type of version to update.
@@ -2668,6 +2649,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _versionType, value);
+                ConfigFactory.Root.VersionUpdate.VersionType = value;
                 ConfigurationHelper.SetValue(ConfigurationKeys.VersionType, value.ToString());
             }
         }
@@ -2688,7 +2670,7 @@ namespace MaaWpfGui.ViewModels.UI
             get => _versionType == UpdateVersionType.Beta;
         }
 
-        private bool _updateCheck = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.UpdateCheck, bool.TrueString));
+        private bool _updateCheck = ConfigFactory.Root.VersionUpdate.UpdateCheck;
 
         /// <summary>
         /// Gets or sets a value indicating whether to check update.
@@ -2699,11 +2681,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _updateCheck, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.UpdateCheck, value.ToString());
+                ConfigFactory.Root.VersionUpdate.UpdateCheck = value;
             }
         }
 
-        private bool _updateAutoCheck = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.UpdateAutoCheck, bool.FalseString));
+        private bool _updateAutoCheck = ConfigFactory.Root.VersionUpdate.UpdateAutoCheck;
 
         /// <summary>
         /// Gets or sets a value indicating whether to check update.
@@ -2718,7 +2700,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private string _proxy = ConfigurationHelper.GetValue(ConfigurationKeys.UpdateProxy, string.Empty);
+        private string _proxy = ConfigFactory.Root.VersionUpdate.Proxy;
 
         /// <summary>
         /// Gets or sets the proxy settings.
@@ -2729,7 +2711,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _proxy, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.UpdateProxy, value);
+                ConfigFactory.Root.VersionUpdate.Proxy = value;
             }
         }
 
@@ -2747,7 +2729,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _autoDownloadUpdatePackage = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoDownloadUpdatePackage, bool.TrueString));
+        private bool _autoDownloadUpdatePackage = ConfigFactory.Root.VersionUpdate.AutoDownloadUpdatePackage;
 
         /// <summary>
         /// Gets or sets a value indicating whether to auto download update package.
@@ -2758,11 +2740,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _autoDownloadUpdatePackage, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AutoDownloadUpdatePackage, value.ToString());
+                ConfigFactory.Root.VersionUpdate.AutoDownloadUpdatePackage = value;
             }
         }
 
-        private bool _autoInstallUpdatePackage = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoInstallUpdatePackage, bool.FalseString));
+        private bool _autoInstallUpdatePackage = ConfigFactory.Root.VersionUpdate.AutoInstallUpdatePackage;
 
         /// <summary>
         /// Gets or sets a value indicating whether to auto install update package.
@@ -2773,7 +2755,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _autoInstallUpdatePackage, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AutoInstallUpdatePackage, value.ToString());
+                ConfigFactory.Root.VersionUpdate.AutoInstallUpdatePackage = value;
             }
         }
 
@@ -3207,7 +3189,7 @@ namespace MaaWpfGui.ViewModels.UI
                 connectConfigName = data.Display;
             }
 
-            string prefix = ConfigurationHelper.GetValue(ConfigurationKeys.WindowTitlePrefix, string.Empty);
+            string prefix = ConfigFactory.CurrentConfig.GUI.WindowTitlePrefix;
             if (!string.IsNullOrEmpty(prefix))
             {
                 prefix += " - ";
@@ -3440,7 +3422,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _hideCloseButton = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.HideCloseButton, bool.FalseString));
+        private bool _hideCloseButton = ConfigFactory.CurrentConfig.GUI.HideCloseButton;
 
         /// <summary>
         /// Gets or sets a value indicating whether to hide close button.
@@ -3451,7 +3433,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _hideCloseButton, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.HideCloseButton, value.ToString());
+                ConfigFactory.CurrentConfig.GUI.HideCloseButton = value;
                 var rvm = (RootViewModel)this.Parent;
                 rvm.ShowCloseButton = !value;
             }

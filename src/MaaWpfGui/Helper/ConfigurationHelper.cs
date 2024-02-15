@@ -254,7 +254,7 @@ namespace MaaWpfGui.Helper
         /// <returns>The result of saving process</returns>
         private static bool Save(string file = null)
         {
-            /*
+            
             if (Released)
             {
                 _logger.Warning("Attempting to save configuration file after release, this is not allowed");
@@ -277,7 +277,7 @@ namespace MaaWpfGui.Helper
                 _logger.Error(e, "Failed to save configuration file.");
                 return false;
             }
-            */
+            
             return true;
         }
 

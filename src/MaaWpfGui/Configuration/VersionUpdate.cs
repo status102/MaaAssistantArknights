@@ -1,4 +1,4 @@
-﻿// <copyright file="VersionUpdate.cs" company="MaaAssistantArknights">
+// <copyright file="VersionUpdate.cs" company="MaaAssistantArknights">
 // MaaWpfGui - A part of the MaaCoreArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -33,6 +33,8 @@ namespace MaaWpfGui.Configuration
 
         public UpdateVersionType VersionType { get; set; } = UpdateVersionType.Stable;
 
+        public string ResourceApi { get; set; } = string.Empty;
+
         public bool UpdateCheck { get; set; } = true;
 
         public bool UpdateAutoCheck { get; set; } = false;
@@ -61,7 +63,7 @@ namespace MaaWpfGui.Configuration
             /// <summary>
             /// 开发版
             /// </summary>
-            Beta
+            Beta,
         }
     }
 }

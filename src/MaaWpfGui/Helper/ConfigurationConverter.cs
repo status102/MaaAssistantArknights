@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using static MaaWpfGui.Configuration.GUI;
+using static MaaWpfGui.Configuration.VersionUpdate;
 using static MaaWpfGui.ViewModels.UI.TaskQueueViewModel;
 
 namespace MaaWpfGui.Helper
@@ -83,34 +84,56 @@ namespace MaaWpfGui.Helper
         private static bool ConvertV4ToV5()
         {
             ConfigurationHelper.Load();
-            ConfigFactory.CurrentConfig.GUI.Localization = ConfigurationHelper.GetValue(ConfigurationKeys.Localization, LocalizationHelper.DefaultLanguage);
-            ConfigFactory.CurrentConfig.GUI.LoadWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.LoadWindowPlacement, bool.TrueString));
-            ConfigFactory.CurrentConfig.GUI.SaveWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.SaveWindowPlacement, bool.TrueString));
-            ConfigFactory.CurrentConfig.GUI.MinimizeToTray = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeToTray, bool.FalseString));
-            ConfigFactory.CurrentConfig.GUI.MinimizeDirectly = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeDirectly, bool.FalseString));
 
-            if (Enum.TryParse<ActionType>(ConfigurationHelper.GetValue(ConfigurationKeys.ActionAfterCompleted, ActionType.DoNothing.ToString()), true, out var actionAfterCompletedResult))
+            // GUI部分
             {
-                ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted = actionAfterCompletedResult;
+                ConfigFactory.CurrentConfig.GUI.Localization = ConfigurationHelper.GetValue(ConfigurationKeys.Localization, LocalizationHelper.DefaultLanguage);
+                ConfigFactory.CurrentConfig.GUI.LoadWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.LoadWindowPlacement, bool.TrueString));
+                ConfigFactory.CurrentConfig.GUI.SaveWindowPlacement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.SaveWindowPlacement, bool.TrueString));
+                ConfigFactory.CurrentConfig.GUI.MinimizeToTray = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeToTray, bool.FalseString));
+                ConfigFactory.CurrentConfig.GUI.MinimizeDirectly = bool.Parse(ConfigurationHelper.GetValue(ConfigurationKeys.MinimizeDirectly, bool.FalseString));
+
+                if (Enum.TryParse<ActionType>(ConfigurationHelper.GetValue(ConfigurationKeys.ActionAfterCompleted, ActionType.DoNothing.ToString()), true, out var actionAfterCompletedResult))
+                {
+                    ConfigFactory.CurrentConfig.GUI.ActionAfterCompleted = actionAfterCompletedResult;
+                }
+
+                if (Enum.TryParse<InverseClearType>(ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear"), true, out var inverseClearModeResult))
+                {
+                    ConfigFactory.CurrentConfig.GUI.InverseClearMode = inverseClearModeResult;
+                }
+
+                if (!bool.TryParse(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString), out var result))
+                {
+                }
+                else
+                {
+                    ConfigFactory.CurrentConfig.GUI.InverseClearShow = result ? InverseClearType.Inverse : InverseClearType.Clear;
+                }
+
+                ConfigFactory.CurrentConfig.GUI.HideCloseButton = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.HideCloseButton, bool.FalseString));
+                ConfigFactory.CurrentConfig.GUI.WindowTitlePrefix = ConfigurationHelper.GetValue(ConfigurationKeys.WindowTitlePrefix, string.Empty);
             }
 
-            if (Enum.TryParse<InverseClearType>(ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear"), true, out var inverseClearModeResult))
+            // VersionUpdate部分
             {
-                ConfigFactory.CurrentConfig.GUI.InverseClearMode = inverseClearModeResult;
+                ConfigFactory.Root.VersionUpdate.Name = ConfigurationHelper.GetValue(ConfigurationKeys.VersionName, string.Empty);
+                ConfigFactory.Root.VersionUpdate.Body = ConfigurationHelper.GetValue(ConfigurationKeys.VersionUpdateBody, string.Empty);
+                ConfigFactory.Root.VersionUpdate.IsFirstBoot = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.VersionUpdateIsFirstBoot, bool.FalseString));
+                ConfigFactory.Root.VersionUpdate.Package = ConfigurationHelper.GetValue(ConfigurationKeys.VersionUpdatePackage, string.Empty);
+                ConfigFactory.Root.VersionUpdate.VersionType = Enum.Parse<UpdateVersionType>(ConfigurationHelper.GetValue(ConfigurationKeys.VersionType, UpdateVersionType.Stable.ToString()));
+
+
+                // 不完全迁移，缺少Proxy更新后监听
+                ConfigFactory.Root.VersionUpdate.Proxy = ConfigurationHelper.GetValue(ConfigurationKeys.UpdateProxy, string.Empty);
+                ConfigFactory.Root.VersionUpdate.UpdateCheck = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.UpdateCheck, bool.TrueString));
+                ConfigFactory.Root.VersionUpdate.UpdateAutoCheck = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.UpdateAutoCheck, bool.FalseString));
+                ConfigFactory.Root.VersionUpdate.ResourceApi = ConfigurationHelper.GetValue(ConfigurationKeys.ResourceApi, string.Empty);
+                ConfigFactory.Root.VersionUpdate.AutoInstallUpdatePackage = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoInstallUpdatePackage, bool.FalseString));
+                ConfigFactory.Root.VersionUpdate.AutoDownloadUpdatePackage = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoDownloadUpdatePackage, bool.TrueString));
             }
 
-            if (ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse")
-            {
-                ConfigFactory.CurrentConfig.GUI.InverseClearMode = InverseClearType.ClearInverse;
-            }
-            if (!bool.TryParse(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString), out var result))
-            {
-            }
-            else
-            {
-                ConfigFactory.CurrentConfig.GUI.InverseClearShow = result ? InverseClearType.Inverse : InverseClearType.Clear;
-            }
-
+            ConfigFactory.Root.AnnouncementInfo.Info = ConfigurationHelper.GetValue(ConfigurationKeys.AnnouncementInfo, string.Empty);
 
             Task.Run(() => ConfigFactory.Save()).Wait();
             return true;

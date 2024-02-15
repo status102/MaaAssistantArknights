@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
+using MaaWpfGui.Configuration;
 using MaaWpfGui.Constants;
 using MaaWpfGui.Helper;
 using MaaWpfGui.ViewModels;
@@ -97,7 +98,7 @@ namespace MaaWpfGui.Models
 
         private static async Task<string> GetResourceApi()
         {
-            string mirror = ConfigurationHelper.GetValue(ConfigurationKeys.ResourceApi, MaaUrls.MaaResourceApi);
+            string mirror = string.IsNullOrEmpty(ConfigFactory.Root.VersionUpdate.ResourceApi) ? MaaUrls.MaaResourceApi : ConfigFactory.Root.VersionUpdate.ResourceApi;
             if (mirror != MaaUrls.MaaResourceApi && await IsMirrorAccessible(mirror))
             {
                 return mirror;
@@ -127,7 +128,7 @@ namespace MaaWpfGui.Models
 
             if (mirror != MaaUrls.MaaResourceApi)
             {
-                ConfigurationHelper.SetValue(ConfigurationKeys.ResourceApi, mirror);
+                ConfigFactory.Root.VersionUpdate.ResourceApi = mirror;
             }
 
             return mirror;
