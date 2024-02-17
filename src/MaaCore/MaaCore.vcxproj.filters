@@ -98,6 +98,9 @@
     <Filter Include="Source\Resource\TaskData">
       <UniqueIdentifier>{8d436f0b-8dad-42b2-9549-f9073b808104}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Controller\Minicap">
+      <UniqueIdentifier>{3a3f2411-9380-435a-a39d-29b5c97e5811}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resource\config.json">
@@ -696,6 +699,18 @@
     <ClInclude Include="Task\Roguelike\RoguelikeInvestTaskPlugin.h">
       <Filter>Source\Task\Roguelike</Filter>
     </ClInclude>
+    <ClInclude Include="Controller\Minicap\MinicapBase.h">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\Minicap\MinicapDef.h">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\Minicap\MinicapDirect.h">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\Minicap\MinicapStream.h">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vision\VisionHelper.cpp">
@@ -1159,6 +1174,15 @@
     </ClCompile>
     <ClCompile Include="Task\Roguelike\RoguelikeInvestTaskPlugin.cpp">
       <Filter>Source\Task\Roguelike</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\Minicap\MinicapBase.cpp">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\Minicap\MinicapDirect.cpp">
+      <Filter>Source\Controller\Minicap</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\Minicap\MinicapStream.cpp">
+      <Filter>Source\Controller\Minicap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
