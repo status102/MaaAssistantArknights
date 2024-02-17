@@ -82,11 +82,15 @@ bool asst::GeneralConfig::parse(const json::value& json)
         adb.start = cfg_json.get("start", base_cfg.start);
         adb.stop = cfg_json.get("stop", base_cfg.stop);
         adb.abilist = cfg_json.get("abilist", base_cfg.abilist);
+        adb.sdk_version = cfg_json.get("sdkVersion", base_cfg.sdk_version);
         adb.orientation = cfg_json.get("orientation", base_cfg.orientation);
         adb.push_minitouch = cfg_json.get("pushMinitouch", base_cfg.push_minitouch);
         adb.chmod_minitouch = cfg_json.get("chmodMinitouch", base_cfg.chmod_minitouch);
         adb.call_minitouch = cfg_json.get("callMinitouch", base_cfg.call_minitouch);
         adb.call_maatouch = cfg_json.get("callMaatouch", base_cfg.call_maatouch);
+        adb.push_minicap = cfg_json.get("pushMinicap", base_cfg.push_minicap);
+        adb.chmod_minicap = cfg_json.get("chmodMinicap", base_cfg.chmod_minicap);
+        adb.call_minicap = cfg_json.get("callMinicap", base_cfg.call_minicap);
         adb.back_to_home = cfg_json.get("back_to_home", base_cfg.back_to_home);
 
         m_adb_cfg[cfg_json.at("configName").as_string()] = std::move(adb);

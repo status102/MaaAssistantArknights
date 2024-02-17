@@ -85,11 +85,15 @@
             "start": "[Adb] -s [AdbSerial] shell am start -n [Intent]",
             "stop": "[Adb] -s [AdbSerial] shell \"PACKAGE_NAME=$(dumpsys activity activities 2>/dev/null | grep -i -o -E '(packageName|Activities)=.+arknights' 2>/dev/null | grep -i -o -E '[^= ]*arknights[^ /]*' | head -n 1); if [ -n \\\"$PACKAGE_NAME\\\" ]; then echo \\\"Closing $PACKAGE_NAME\\\"; am force-stop $PACKAGE_NAME; else echo \\\"app not running or arknights package name not found\\\"; fi\"",
             "abilist": "[Adb] -s [AdbSerial] shell getprop ro.product.cpu.abilist",
+            "sdkVersion": "[Adb] -s [AdbSerial] shell getprop ro.build.version.sdk",
             "orientation": "[Adb] -s [AdbSerial] shell dumpsys input | grep SurfaceOrientation | grep -m 1 -o -E [0-9]",
             "pushMinitouch": "[Adb] -s [AdbSerial] push \"[minitouchLocalPath]\" \"/data/local/tmp/[minitouchWorkingFile]\"",
             "chmodMinitouch": "[Adb] -s [AdbSerial] shell chmod 700 \"/data/local/tmp/[minitouchWorkingFile]\"",
             "callMinitouch": "[Adb] -s [AdbSerial] shell \"/data/local/tmp/[minitouchWorkingFile]\" -i",
             "callMaatouch": "[Adb] -s [AdbSerial] shell \"export CLASSPATH=/data/local/tmp/[minitouchWorkingFile]; app_process /data/local/tmp com.shxyke.MaaTouch.App\"",
+            "pushMinicap": "[Adb] -s [AdbSerial] push \"[minicapLocalPath]\" \"/data/local/tmp/minicap/\"",
+            "chmodMinicap": "[Adb] -s [AdbSerial] shell chmod 700 \"/data/local/tmp/minicap/*\"",
+            "callMinicap": "[Adb] -s [AdbSerial] shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap/minicap ",
             "back_to_home": "[Adb] -s [AdbSerial] shell input keyevent HOME"
         },
         {

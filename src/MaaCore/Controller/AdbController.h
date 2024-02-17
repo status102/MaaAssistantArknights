@@ -95,6 +95,7 @@ namespace asst
             std::string screencap_raw_by_nc;
             std::string screencap_raw_with_gzip;
             std::string screencap_encode;
+            std::string call_minicap;
             std::string release;
 
             std::string start;

@@ -740,6 +740,7 @@ bool asst::AdbController::connect(const std::string& adb_path, const std::string
     m_adb.press_esc = cmd_replace(adb_cfg.press_esc);
     m_adb.screencap_raw_with_gzip = cmd_replace(adb_cfg.screencap_raw_with_gzip);
     m_adb.screencap_encode = cmd_replace(adb_cfg.screencap_encode);
+    m_adb.call_minicap = cmd_replace(adb_cfg.call_minicap);
     m_adb.start = cmd_replace(adb_cfg.start);
     m_adb.stop = cmd_replace(adb_cfg.stop);
     m_adb.back_to_home = cmd_replace(adb_cfg.back_to_home);

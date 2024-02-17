@@ -77,11 +77,15 @@ namespace asst
         std::string start;
         std::string stop;
         std::string abilist;
+        std::string sdk_version;
         std::string orientation;
         std::string push_minitouch;
         std::string chmod_minitouch;
         std::string call_minitouch;
         std::string call_maatouch;
+        std::string push_minicap;
+        std::string chmod_minicap;
+        std::string call_minicap;
         std::string back_to_home;
     };
 

@@ -46,4 +46,9 @@ namespace asst::utils
         string_replace_all_in_place(stem, { { ":", "-" }, { " ", "_" }, { ".", "-" } });
         return stem;
     }
+
+    inline std::chrono::milliseconds duration_since(const std::chrono::steady_clock::time_point& start_time)
+    {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time);
+    }
 } // namespace asst::utils

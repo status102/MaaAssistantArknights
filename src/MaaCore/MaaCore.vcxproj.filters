@@ -711,6 +711,9 @@
     <ClInclude Include="Controller\Minicap\MinicapStream.h">
       <Filter>Source\Controller\Minicap</Filter>
     </ClInclude>
+    <ClInclude Include="Controller\MiniController.h">
+      <Filter>Source\Controller</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vision\VisionHelper.cpp">
@@ -1183,6 +1186,9 @@
     </ClCompile>
     <ClCompile Include="Controller\Minicap\MinicapStream.cpp">
       <Filter>Source\Controller\Minicap</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\MiniController.cpp">
+      <Filter>Source\Controller</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

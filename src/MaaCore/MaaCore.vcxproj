@@ -63,6 +63,7 @@
     <ClInclude Include="Controller\Minicap\MinicapDef.h" />
     <ClInclude Include="Controller\Minicap\MinicapDirect.h" />
     <ClInclude Include="Controller\Minicap\MinicapStream.h" />
+    <ClInclude Include="Controller\MiniController.h" />
     <ClInclude Include="Controller\MinitouchController.h" />
     <ClInclude Include="Controller\PlayToolsController.h" />
     <ClInclude Include="Controller\AdbController.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="Controller\Minicap\MinicapBase.cpp" />
     <ClCompile Include="Controller\Minicap\MinicapDirect.cpp" />
     <ClCompile Include="Controller\Minicap\MinicapStream.cpp" />
+    <ClCompile Include="Controller\MiniController.cpp" />
     <ClCompile Include="Controller\MinitouchController.cpp" />
     <ClCompile Include="Controller\PlayToolsController.cpp" />
     <ClCompile Include="Controller\AdbController.cpp" />
