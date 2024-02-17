@@ -6,7 +6,7 @@
 
 bool asst::MiniController::connect(const std::string& adb_path, const std::string& address, const std::string& config)
 {
-    bool res = MiniController::connect(adb_path, address, config);
+    bool res = MinitouchController::connect(adb_path, address, config);
     if (!res) return false;
 
     auto get_info_json = [&]() -> json::value {
@@ -61,13 +61,13 @@ bool asst::MiniController::screencap(cv::Mat& image_payload, bool allow_reconnec
 {
     using namespace std::chrono;
     auto start_time = steady_clock::now();
-    const auto once_command = m_adb.call_minicap + "-P " + std::to_string(m_width) + "x" + std::to_string(m_height) + "@" +
-                              std::to_string(m_width) + "x" + std::to_string(m_height) + "/0 -s";
+    const auto once_command = m_adb.call_minicap + "-P " + std::to_string(m_width) + "x" + std::to_string(m_height) +
+                              "@" + std::to_string(m_width) + "x" + std::to_string(m_height) + "/0 -s";
 
     bool is_success = false;
     do {
-        auto res = call_command(once_command);
-        if (!res) break;
+        auto res = call_command(once_command, 2000, allow_reconnect);
+        if (!res || res->empty()) break;
 
         auto decode_res = process_data(res.value(), trunc_decode_jpg);
         if (!decode_res) return false;
@@ -118,14 +118,9 @@ bool asst::MiniController::probe_minicap(const AdbCfg& adb_cfg,
     LogTraceFunction;
 
     static const std::vector<std::string> kDefaultArch = {
-        /*
         "x86",
         "armeabi-v7a",
-        "armeabi",*/
-        "x86_64",
-        "x86",
-        "arm64-v8a",
-        "armeabi-v7a",
+        "armeabi",
     };
     static const std::vector<int> kDefaultSdk = {
         31, 29, 28, 27, 26, 25, 24, 23, 22, 21, 19, 18, 17, 16, 15, 14,
@@ -141,28 +136,34 @@ bool asst::MiniController::probe_minicap(const AdbCfg& adb_cfg,
         }
     }
     std::string sdk_str = call_command(cmd_replace(adb_cfg.sdk_version)).value_or("0");
-    if (!utils::chars_to_number<int, true>(sdk_str, sdk)) {
+    if (!utils::chars_to_number(sdk_str, sdk)) {
         LogError << "Failed to convert sdk version: " << sdk_str;
         return false;
+    }
+    if (ranges::count(kDefaultSdk, sdk) == 0) {
+        sdk = 31;
+        //return false;
     }
     Log.info("arch", arch, "sdk", sdk);
 
     if (arch.empty()) return false;
 
-    auto minicap_cmd_rep = [&](const std::string& cfg_cmd, std::filesystem::path arg = {}) -> std::string {
+    auto minicap_cmd_rep = [&](const std::string& cfg_cmd, std::filesystem::path arg = {},
+                               std::string file_name = "") -> std::string {
         return utils::string_replace_all(
             cmd_replace(cfg_cmd),
             {
                 { "[minicapLocalPath]", utils::path_to_utf8_string(ResDir.get() / "minicap"_p / arch / arg) },
+                { "[minicapFileName]", file_name },
             });
     };
     const auto bin_path = "bin"_p / "minicap"_p;
     const auto lib_path = "lib"_p / ("android-" + std::to_string(sdk)) / "minicap.so"_p;
-    if (!call_command(minicap_cmd_rep(adb_cfg.push_minicap, bin_path))) return false;
-    if (!call_command(minicap_cmd_rep(adb_cfg.push_minicap, lib_path))) return false;
+    if (!call_command(minicap_cmd_rep(adb_cfg.push_minicap, bin_path, "minicap"))) return false;
+    if (!call_command(minicap_cmd_rep(adb_cfg.push_minicap, lib_path, "minicap.so"))) return false;
     if (!call_command(minicap_cmd_rep(adb_cfg.chmod_minicap))) return false;
 
-    //if (!call_and_hup_minitouch()) return false;
+    // if (!call_and_hup_minitouch()) return false;
 
     return true;
 }

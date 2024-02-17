@@ -91,9 +91,9 @@
             "chmodMinitouch": "[Adb] -s [AdbSerial] shell chmod 700 \"/data/local/tmp/[minitouchWorkingFile]\"",
             "callMinitouch": "[Adb] -s [AdbSerial] shell \"/data/local/tmp/[minitouchWorkingFile]\" -i",
             "callMaatouch": "[Adb] -s [AdbSerial] shell \"export CLASSPATH=/data/local/tmp/[minitouchWorkingFile]; app_process /data/local/tmp com.shxyke.MaaTouch.App\"",
-            "pushMinicap": "[Adb] -s [AdbSerial] push \"[minicapLocalPath]\" \"/data/local/tmp/minicap/\"",
-            "chmodMinicap": "[Adb] -s [AdbSerial] shell chmod 700 \"/data/local/tmp/minicap/*\"",
-            "callMinicap": "[Adb] -s [AdbSerial] shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap/minicap ",
+            "pushMinicap": "[Adb] -s [AdbSerial] push \"[minicapLocalPath]\" \"/data/local/tmp/[minicapFileName]\"",
+            "chmodMinicap": "[Adb] -s [AdbSerial] shell chmod 700 \"/data/local/tmp/*\"",
+            "callMinicap": "[Adb] -s [AdbSerial] shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap ",
             "back_to_home": "[Adb] -s [AdbSerial] shell input keyevent HOME"
         },
         {
