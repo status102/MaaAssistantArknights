@@ -22,5 +22,13 @@ namespace asst
         static std::optional<cv::Mat> decode_jpg(const std::string& buffer);
         static bool check_head_tail(std::string_view input, std::string_view head, std::string_view tail);
         static std::optional<cv::Mat> decode(const std::string& buffer);
+
+        
+    protected:
+        virtual std::optional<std::string> reconnect(const std::string& cmd, int64_t timeout,
+                                                     bool recv_by_socket) override;
+
+        private:
+        bool minicap_test();
     };
 }; // namespace asst

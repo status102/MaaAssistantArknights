@@ -43,6 +43,7 @@ bool asst::MiniController::connect(const std::string& adb_path, const std::strin
 
     const auto& adb_cfg = adb_ret.value();
 
+    m_adb.call_minicap = cmd_replace(adb_cfg.call_minicap);
     bool m_minicap_available = probe_minicap(adb_cfg, cmd_replace);
 
     if (!m_minicap_available) {
@@ -141,8 +142,14 @@ bool asst::MiniController::probe_minicap(const AdbCfg& adb_cfg,
         return false;
     }
     if (ranges::count(kDefaultSdk, sdk) == 0) {
-        sdk = 31;
-        //return false;
+        if (sdk < 31) {
+            LogError << "Unsupported sdk version: " << sdk;
+            return false;
+        }
+        else {
+            LogWarn << "Unsupported sdk version: " << sdk << ", try to use sdk 31";
+            sdk = 31;
+        }
     }
     Log.info("arch", arch, "sdk", sdk);
 
@@ -163,7 +170,7 @@ bool asst::MiniController::probe_minicap(const AdbCfg& adb_cfg,
     if (!call_command(minicap_cmd_rep(adb_cfg.push_minicap, lib_path, "minicap.so"))) return false;
     if (!call_command(minicap_cmd_rep(adb_cfg.chmod_minicap))) return false;
 
-    // if (!call_and_hup_minitouch()) return false;
+    if (!minicap_test()) return false;
 
     return true;
 }
@@ -309,4 +316,24 @@ std::optional<cv::Mat> asst::MiniController::decode(const std::string& buffer)
 {
     cv::Mat img = cv::imdecode({ buffer.data(), int(buffer.size()) }, cv::IMREAD_COLOR);
     return img.empty() ? std::nullopt : std::make_optional(img);
+}
+
+std::optional<std::string> asst::MiniController::reconnect(const std::string& cmd, int64_t timeout, bool recv_by_socket)
+{
+    auto ret = MinitouchController::reconnect(cmd, timeout, recv_by_socket);
+    if (!ret) {
+        return std::nullopt;
+    }
+    if (!minicap_test()) return std::nullopt;
+    return ret;
+}
+
+bool asst::MiniController::minicap_test()
+{
+    const auto once_command = m_adb.call_minicap + "-P " + std::to_string(m_width) + "x" + std::to_string(m_height) +
+                              "@" + std::to_string(m_width) + "x" + std::to_string(m_height) + "/0 -t";
+    auto res = call_command(once_command, 2000, false);
+    if (!res || res->empty()) return false;
+    clean_cr(*res);
+    return res->ends_with("OK\n");
 }
