@@ -1,0 +1,139 @@
+name: personal-builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release note"
+        type: string
+        required: true
+      ref:
+        description: "Commit to build (git checkout)"
+        type: string
+        required: false
+
+jobs:
+  build-win-nightly:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - msbuild_target: x64
+            lowercase_target: x64
+      fail-fast: false
+    env:
+      MAABUILDER_TARGET_PLATFORM: ${{ matrix.msbuild_target }}
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+      pre_version: ${{ steps.set_tag.outputs.pre_version }}
+      main_tag_name: ${{ steps.push_main_tag.outputs.main_tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # repository: 'MaaAssistantArknights/MaaAssistantArknights'
+          submodules: recursive
+          #ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout ref
+        run: |
+          if ("${{ inputs.ref }}" -ne "") {
+            git checkout --progress --recurse-submodules ${{ inputs.ref || 'dev' }}
+          }
+
+      - name: Install semver
+        run: |
+          npm install --global --progress semver
+
+      - name: Set tag
+        id: set_tag
+        run: |
+          $described = $(git describe --tags --long --match 'v*')
+          $ids = $($described -split "-")
+          if ($ids.length -eq 3) {
+            $ver = "v$(semver --increment $ids[0].Substring(1))"
+            $pre_version = "$($ids[0])"
+            $dist = `printf "%03d"` $ids[1]
+            echo "tag=$($ids[0]).d$($dist).$($ids[2]).${{ inputs.tag }}" >> $env:GITHUB_OUTPUT
+            echo "pre_version=$pre_version" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          if ($ids.length -eq 4) {
+            $dist = `printf "%03d"` $ids[2]
+            $pre_version = "$($ids[0])""-""$($ids[1])"
+            echo "tag=$($ids[0])-$($ids[1]).d$($dist).$($ids[3]).${{ inputs.tag }}" >> $env:GITHUB_OUTPUT
+            echo "pre_version=$pre_version" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          echo "tag=${{ inputs.tag }}" >> $env:GITHUB_OUTPUT
+          exit 0
+
+      - name: Push tag to main repo
+        id: push_main_tag
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          $main_tag_name=$(echo "alpha/${{ steps.set_tag.outputs.tag }}")
+          git tag $main_tag_name -f
+          git push --tags origin HEAD:refs/tags/$main_tag_name -f
+          echo "main_tag_name=$main_tag_name" >> $env:GITHUB_OUTPUT
+
+      - name: Cache .nuke/temp, ~/.nuget/packages
+        id: cache-nuget
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+  
+      - name: Restore dependencies
+        if: steps.cache-nuget.outputs.cache-hit != 'true'
+        run: dotnet restore
+
+      - name: Bootstrap MaaDeps
+        run: |
+          python3 maadeps-download.py ${{ matrix.lowercase_target }}-windows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Taggify Version
+        run: |
+          $csprojPath = "src/MaaWpfGui/MaaWpfGui.csproj"
+          $csprojPath = Resolve-Path -Path $csprojPath
+          $tag = '${{ steps.set_tag.outputs.tag }}' -replace '.*?/', ''
+          if ($tag -match '\d+(\.\d+){1,3}') {
+              $match = $Matches[0]
+          } else {
+              $match = "0.0.1"
+          }
+          echo "Tag value: $tag"
+          echo "Version value: $match"
+          [xml]$csproj = Get-Content -Path $csprojPath
+          $node = $csproj.Project.PropertyGroup | where {$_.ApplicationVersion -ne $null}
+          $node.InformationalVersion = $tag
+          $node.Version = $match
+          $node.FileVersion = $match
+          $node.AssemblyVersion = $match
+          $csproj.Save($csprojPath)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run './build.cmd DevBuild'
+        run: |
+          $env:GITHUB_WORKFLOW = 'dev-build-win' # pretend this is a dev-build-win workflow
+          $env:MAA_BUILDER_MAA_VERSION = "${{ steps.set_tag.outputs.tag }}"
+          echo "tag: " $env:MAA_BUILDER_MAA_VERSION
+
+          ./build.cmd DevBuild
+        env:
+          Reason: "Build nightly version"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload MAA to Github
+        uses: actions/upload-artifact@v4
+        with:
+          name: MAA-win-${{ matrix.lowercase_target }}
+          path: artifacts
