@@ -5,11 +5,6 @@ IndentWidth: 4
 ---
 Language: Cpp
 BasedOnStyle: 'WebKit'
-# AccessModifierOffset: 2
-AlignAfterOpenBracket: 'AlwaysBreak'
-AlignArrayOfStructures: None
-AlignConsecutiveAssignments: None
-AlignConsecutiveBitFields: None
 AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
 # AlignConsecutiveShortCaseStatements: None
