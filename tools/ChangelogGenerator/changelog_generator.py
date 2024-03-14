@@ -4,6 +4,9 @@ import json
 import re
 import urllib.request
 import urllib.error
+import sys
+
+print(sys.getdefaultencoding())
 
 cur_dir = os.path.dirname(__file__)
 contributors_path = os.path.abspath(os.path.join(cur_dir, 'contributors.json'))
@@ -18,11 +21,11 @@ contributors = {}
 raw_commits_info = {}
 
 translations = {
-    '修复': 'fix', 
+    '修复': 'fix',
     '新增': 'feat',
-    '更新': 'perf', 
-    '改进': 'perf', 
-    '优化': 'perf', 
+    '更新': 'perf',
+    '改进': 'perf',
+    '优化': 'perf',
     '重构': 'perf',
     '其他': 'other'
 }
@@ -30,7 +33,7 @@ translations = {
 translations_resort = {
     '新增 | New': 'feat',
     '改进 | Improved': 'perf',
-    '修复 | Fix': 'fix', 
+    '修复 | Fix': 'fix',
     '其他 | Other': 'other'
 }
 
