@@ -4,16 +4,33 @@ on:
   pull_request:
     types: [opened, edited, ready_for_review, reopened, synchronize]
 
-permissions:
-  issues: write
-  pull-requests: write
 
 jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+        - uses: actions/github-script@v6
+          with:
+              script: |
+                  await github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: 'Thank you for posting this issue. 🙇🏼‍♂️<br/>We will come back to you shortly.'
+                  })
+
   check_commit_name_in_pr:
     if: ${{ !github.event.pull_request.merged && github.base_ref != 'master' }}
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Cleanup Previous Comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -33,8 +50,20 @@ jobs:
               });
             }
 
+      - uses: actions/github-script@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            script: |
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: 'Thank you for posting this issue. 🙇🏼‍♂️<br/>We will come back to you shortly.'
+                })
+
       - name: Check Commits
-        uses: actions/github-script@v7
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
