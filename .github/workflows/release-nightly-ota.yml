@@ -95,6 +95,7 @@ jobs:
         run: |
           $content=$(git log --pretty=format:"%s" ${{ steps.set_tag.outputs.pre_version }}..alpha/${{ steps.set_tag.outputs.tag }})
           echo "changelog=$content" >> $env:GITHUB_OUTPUT
+          echo $content
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
