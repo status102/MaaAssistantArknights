@@ -96,6 +96,7 @@ jobs:
           python3 tools/ChangelogGenerator/changelog_generator.py --tag "${{ steps.set_tag.outputs.tag }}" --latest "${{ steps.set_tag.outputs.pre_version }}"
           content=$(cat CHANGELOG.md)
           echo "changelog=$content" >> $env:GITHUB_OUTPUT
+          console.log($content)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
