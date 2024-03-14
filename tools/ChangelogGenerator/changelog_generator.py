@@ -203,7 +203,7 @@ def convert_contributors_name(name: str, commit_hash: str, name_type: str):
 
 def call_command(command: str):
     with os.popen(command) as fp: bf = fp._stream.buffer.read()
-    try: command_ret = bf.decode("utf-8").strip()
+    try: command_ret = bf.decode("utf8").strip()
     except: command_ret = bf.decode("gbk").strip()
     return command_ret
 
