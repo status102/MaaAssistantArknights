@@ -1,19 +1,21 @@
 name: PR Checker
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, ready_for_review, reopened, synchronize]
 
-permissions:
-  issues: write
-  pull-requests: write
 
 jobs:
   check_commit_name_in_pr:
     if: ${{ !github.event.pull_request.merged && github.base_ref != 'master' }}
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Cleanup Previous Comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -32,7 +34,6 @@ jobs:
                 comment_id: previousComment.id
               });
             }
-
       - name: Check Commits
         uses: actions/github-script@v7
         with:
