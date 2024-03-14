@@ -93,7 +93,7 @@ jobs:
       - name: Generate Changelog
         id: generate_changelog
         run: |
-          $content=$(git log --pretty=format:"%s" ${{ steps.set_tag.outputs.pre_version }}..alpha/${{ steps.set_tag.outputs.tag }})
+          $content=$(git log --pretty=format:"%s @%an %h" ${{ steps.set_tag.outputs.pre_version }}..alpha/${{ steps.set_tag.outputs.tag }})
           echo "changelog=$content" >> $env:GITHUB_OUTPUT
           echo $content
         env:
