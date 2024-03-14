@@ -93,7 +93,7 @@ jobs:
       - name: Generate Changelog
         id: generate_changelog
         run: |
-          python3 tools/ChangelogGenerator/changelog_generator.py --tag "${{ steps.set_tag.outputs.tag }}" --latest "${{ steps.set_tag.outputs.pre_version }}"
+          python tools/ChangelogGenerator/changelog_generator.py --tag "${{ steps.set_tag.outputs.tag }}" --latest "${{ steps.set_tag.outputs.pre_version }}"
           content=$(cat CHANGELOG.md)
           echo "changelog=$content" >> $env:GITHUB_OUTPUT
           console.log($content)
