@@ -306,6 +306,15 @@ bool asst::AdbController::start_game(const std::string& client_type)
     return ret;
 }
 
+bool asst::AdbController::start_game_by_activity(const std::string& activity_name)
+{
+    if (activity_name.empty()) {
+        return false;
+    }
+    std::string cur_cmd = utils::string_replace_all(m_adb.start, "[Intent]", activity_name);
+    return call_command(cur_cmd).has_value();
+}
+
 bool asst::AdbController::stop_game(const std::string& client_type)
 {
     if (client_type.empty()) {
