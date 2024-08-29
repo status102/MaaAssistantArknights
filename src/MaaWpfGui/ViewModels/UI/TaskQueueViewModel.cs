@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using MaaWpfGui.Configuration;
 using MaaWpfGui.Constants;
 using MaaWpfGui.Extensions;
 using MaaWpfGui.Helper;
@@ -59,7 +60,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// <summary>
         /// Gets or private sets the view models of task items.
         /// </summary>
-        public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; private set; }
+        public ObservableCollection<TaskViewModel> TaskItemViewModels { get; private set; }
 
         /// <summary>
         /// Gets the visibility of task setting views.
@@ -592,12 +593,13 @@ namespace MaaWpfGui.ViewModels.UI
                 taskList.Add("Reclamation");
             }
 
-            var tempOrderList = new List<DragItemViewModel>(new DragItemViewModel[taskList.Count]);
-            var nonOrderList = new List<DragItemViewModel>();
-            for (int i = 0; i != taskList.Count; ++i)
             {
-                var task = taskList[i];
-                bool parsed = int.TryParse(ConfigurationHelper.GetTaskOrder(task, "-1"), out var order);
+                var tempOrderList = new List<DragItemViewModel>(new DragItemViewModel[taskList.Count]);
+                var nonOrderList = new List<DragItemViewModel>();
+                for (int i = 0; i != taskList.Count; ++i)
+                {
+                    var task = taskList[i];
+                    bool parsed = int.TryParse(ConfigurationHelper.GetTaskOrder(task, "-1"), out var order);
 
                 DragItemViewModel vm = new DragItemViewModel(
                     LocalizationHelper.GetString(task),
@@ -605,34 +607,38 @@ namespace MaaWpfGui.ViewModels.UI
                     "TaskQueue.",
                     task is not ("AutoRoguelike" or "Reclamation"));
 
-                if (task == TaskSettingVisibilityInfo.DefaultVisibleTaskSetting)
-                {
-                    vm.EnableSetting = true;
+                    if (task == TaskSettingVisibilityInfo.DefaultVisibleTaskSetting)
+                    {
+                        vm.EnableSetting = true;
+                    }
+
+                    if (!parsed || order < 0 || order >= tempOrderList.Count)
+                    {
+                        nonOrderList.Add(vm);
+                    }
+                    else
+                    {
+                        tempOrderList[order] = vm;
+                    }
                 }
 
-                if (!parsed || order < 0 || order >= tempOrderList.Count || tempOrderList[order] != null)
+                foreach (var newVm in nonOrderList)
                 {
-                    nonOrderList.Add(vm);
-                }
-                else
-                {
-                    tempOrderList[order] = vm;
-                }
-            }
+                    int i = 0;
+                    while (tempOrderList[i] != null)
+                    {
+                        ++i;
+                    }
 
-            foreach (var newVm in nonOrderList)
-            {
-                int i = 0;
-                while (tempOrderList[i] != null)
-                {
-                    ++i;
+                    tempOrderList[i] = newVm;
                 }
-
-                tempOrderList[i] = newVm;
                 ConfigurationHelper.SetTaskOrder(newVm.OriginalName, i.ToString());
             }
 
-            TaskItemViewModels = new ObservableCollection<DragItemViewModel>(tempOrderList);
+            var tempOrderList = new List<TaskViewModel>(new TaskViewModel[ConfigFactory.CurrentConfig.TaskQueue.Count]);
+            int i = 0;
+            tempOrderList.ForEach(x => x.Index = i++);
+            TaskItemViewModels = new ObservableCollection<TaskViewModel>(tempOrderList);
 
             InitDrops();
             NeedToUpdateDatePrompt();
@@ -835,18 +841,18 @@ namespace MaaWpfGui.ViewModels.UI
         {
             foreach (var item in TaskItemViewModels)
             {
-                switch (item.OriginalName)
+                switch (ConfigFactory.CurrentConfig.TaskQueue[item.Index].TaskType)
                 {
-                    case "AutoRoguelike":
-                    case "Reclamation":
+                    case SpecificConfig.TaskTypeEnum.Roguelike:
+                    case SpecificConfig.TaskTypeEnum.Reclamation:
                         continue;
                 }
 
-                item.IsChecked = true;
+                item.en = true;
             }
         }
 
-        private bool _inverseMode = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString));
+        private bool _inverseMode = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse;
 
         /// <summary>
         /// Gets or sets a value indicating whether to use inverse mode.
@@ -859,7 +865,7 @@ namespace MaaWpfGui.ViewModels.UI
                 SetAndNotify(ref _inverseMode, value);
                 InverseShowText = value ? LocalizationHelper.GetString("Inverse") : LocalizationHelper.GetString("Clear");
                 InverseMenuText = value ? LocalizationHelper.GetString("Clear") : LocalizationHelper.GetString("Inverse");
-                ConfigurationHelper.SetValue(ConfigurationKeys.MainFunctionInverseMode, value.ToString());
+                ConfigFactory.CurrentConfig.GUI.InverseClearShow = value ? GUI.InverseClearType.Inverse : GUI.InverseClearType.Clear;
             }
         }
 
@@ -868,8 +874,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// </summary>
         public const int SelectedAllWidthWhenBoth = 80;
 
-        private int _selectedAllWidth =
-            ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse" ? SelectedAllWidthWhenBoth : 85;
+        private int _selectedAllWidth = ConfigFactory.CurrentConfig.GUI.InverseClearMode == GUI.InverseClearType.ClearInverse ? SelectedAllWidthWhenBoth : 85;
 
         /// <summary>
         /// Gets or sets the width of "Select All".
@@ -880,7 +885,7 @@ namespace MaaWpfGui.ViewModels.UI
             set => SetAndNotify(ref _selectedAllWidth, value);
         }
 
-        private bool _showInverse = ConfigurationHelper.GetValue(ConfigurationKeys.InverseClearMode, "Clear") == "ClearInverse";
+        private bool _showInverse = ConfigFactory.CurrentConfig.GUI.InverseClearMode == GUI.InverseClearType.ClearInverse;
 
         /// <summary>
         /// Gets or sets a value indicating whether "Select inversely" is visible.
@@ -891,7 +896,7 @@ namespace MaaWpfGui.ViewModels.UI
             set => SetAndNotify(ref _showInverse, value);
         }
 
-        private string _inverseShowText = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString))
+        private string _inverseShowText = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse
             ? LocalizationHelper.GetString("Inverse")
             : LocalizationHelper.GetString("Clear");
 
@@ -904,7 +909,7 @@ namespace MaaWpfGui.ViewModels.UI
             private set => SetAndNotify(ref _inverseShowText, value);
         }
 
-        private string _inverseMenuText = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.MainFunctionInverseMode, bool.FalseString))
+        private string _inverseMenuText = ConfigFactory.CurrentConfig.GUI.InverseClearShow == GUI.InverseClearType.Inverse
             ? LocalizationHelper.GetString("Clear")
             : LocalizationHelper.GetString("Inverse");
 
