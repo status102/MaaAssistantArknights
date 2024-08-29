@@ -265,7 +265,7 @@ namespace MaaWpfGui.Main
                     Instances.TaskQueueViewModel.AddLog(string.Format(LocalizationHelper.GetString("GpuDeprecatedMessage"), x.GpuInfo?.Description), UiLogColor.Warning);
                 }
 
-                _logger.Debug("Using GPU {0} (Driver {1} {2})", x.GpuInfo?.Description, x.GpuInfo?.DriverVersion, x.GpuInfo?.DriverDate?.ToString("yyyy-MM-dd"));
+                _logger.Information("Using GPU {0} (Driver {1} {2})", x.GpuInfo?.Description, x.GpuInfo?.DriverVersion, x.GpuInfo?.DriverDate?.ToString("yyyy-MM-dd"));
 
                 AsstSetStaticOption(AsstStaticOptionKey.GpuOCR, x.Index.ToString());
             }
@@ -767,8 +767,7 @@ namespace MaaWpfGui.Main
                             TaskType.Mall,
                             TaskType.Award,
                             TaskType.Roguelike,
-                            TaskType.ReclamationAlgorithm,
-                            TaskType.ReclamationAlgorithm2,
+                            TaskType.Reclamation,
                         };
 
                         // 仅有一个任务且为 CloseDown 时，不执行任务链结束后操作
@@ -976,6 +975,10 @@ namespace MaaWpfGui.Main
                     Instances.TaskQueueViewModel.AddLog(LocalizationHelper.GetString("FailedToOpenClient"), UiLogColor.Error);
                     break;
 
+                case "StopGameTask":
+                    Instances.TaskQueueViewModel.AddLog(LocalizationHelper.GetString("CloseArknightsFailed"), UiLogColor.Error);
+                    break;
+
                 case "AutoRecruitTask":
                     {
                         var whyStr = details.TryGetValue("why", out var why) ? why.ToString() : LocalizationHelper.GetString("ErrorOccurred");
@@ -1006,7 +1009,8 @@ namespace MaaWpfGui.Main
                             var missingOpers = details["details"]?["opers"]?.ToObject<List<List<string>>>();
                             if (missingOpers is not null)
                             {
-                                var missingOpersStr = "[" + string.Join("]; [", missingOpers.Select(opers => string.Join(", ", opers))) + "]";
+                                var missingOpersStr = "[" + string.Join("]; [", missingOpers.Select(opers =>
+                                    string.Join(", ", opers.Select(oper => DataHelper.GetLocalizedCharacterName(oper))))) + "]";
                                 Instances.CopilotViewModel.AddLog(LocalizationHelper.GetString("MissingOperators") + missingOpersStr, UiLogColor.Error);
                             }
                             else
@@ -1199,11 +1203,11 @@ namespace MaaWpfGui.Main
             switch (taskChain)
             {
                 case "Depot":
-                    Instances.RecognizerViewModel.DepotParse((JObject)subTaskDetails);
+                    Instances.RecognizerViewModel.DepotParse((JObject?)subTaskDetails);
                     break;
 
                 case "OperBox":
-                    Instances.RecognizerViewModel.OperBoxParse((JObject)subTaskDetails);
+                    Instances.RecognizerViewModel.OperBoxParse((JObject?)subTaskDetails);
                     break;
             }
 
@@ -1428,11 +1432,12 @@ namespace MaaWpfGui.Main
                     }
 
                 case "BattleFormation":
-                    Instances.CopilotViewModel.AddLog(LocalizationHelper.GetString("BattleFormation") + "\n" + JsonConvert.SerializeObject(subTaskDetails!["formation"]));
+                    Instances.CopilotViewModel.AddLog(LocalizationHelper.GetString("BattleFormation") + "\n[" +
+                        string.Join(", ", subTaskDetails!["formation"]?.ToObject<List<string>>().Select(oper => DataHelper.GetLocalizedCharacterName(oper))) + "]");
                     break;
 
                 case "BattleFormationSelected":
-                    Instances.CopilotViewModel.AddLog(LocalizationHelper.GetString("BattleFormationSelected") + subTaskDetails!["selected"]);
+                    Instances.CopilotViewModel.AddLog(LocalizationHelper.GetString("BattleFormationSelected") + DataHelper.GetLocalizedCharacterName(subTaskDetails!["selected"]?.ToString()));
                     break;
 
                 case "CopilotAction":
@@ -1448,7 +1453,7 @@ namespace MaaWpfGui.Main
                             string.Format(
                                 LocalizationHelper.GetString("CurrentSteps"),
                                 subTaskDetails["action"],
-                                subTaskDetails["target"]));
+                                DataHelper.GetLocalizedCharacterName(subTaskDetails["target"]?.ToString())));
 
                         break;
                     }
@@ -1491,7 +1496,7 @@ namespace MaaWpfGui.Main
 
                 case "CustomInfrastRoomOperators":
                     string nameStr = (subTaskDetails!["names"] ?? new JArray())
-                        .Aggregate(string.Empty, (current, name) => current + name + ", ");
+                        .Aggregate(string.Empty, (current, name) => current + DataHelper.GetLocalizedCharacterName(name.ToString()) + ", ");
 
                     if (nameStr != string.Empty)
                     {
@@ -1748,46 +1753,7 @@ namespace MaaWpfGui.Main
 
             if (Instances.SettingsViewModel.AutoDetectConnection)
             {
-                string? bsHvAddress = Instances.SettingsViewModel.TryToSetBlueStacksHyperVAddress();
-
-                if (string.Equals(Instances.SettingsViewModel.ConnectAddress, bsHvAddress))
-                {
-                    // 防止bsHvAddress和connectAddress重合
-                    bsHvAddress = string.Empty;
-                }
-
-                // tcp连接测试端口是否有效，超时时间500ms
-                // 如果是本地设备，没有冒号
-                bool adbResult =
-                    (!Instances.SettingsViewModel.ConnectAddress.Contains(':') &&
-                    !string.IsNullOrEmpty(Instances.SettingsViewModel.ConnectAddress)) ||
-                    IfPortEstablished(Instances.SettingsViewModel.ConnectAddress);
-                bool bsResult = IfPortEstablished(bsHvAddress);
-
-                if (adbResult)
-                {
-                    error = string.Empty;
-                }
-                else if (bsResult)
-                {
-                    if (string.IsNullOrEmpty(Instances.SettingsViewModel.AdbPath))
-                    {
-                        Instances.SettingsViewModel.DetectAdbConfig(ref error);
-                    }
-
-                    Instances.SettingsViewModel.ConnectAddress = bsHvAddress;
-                    if (string.IsNullOrEmpty(error))
-                    {
-                        error = string.Empty;
-                    }
-                }
-                else if (Instances.SettingsViewModel.DetectAdbConfig(ref error))
-                {
-                    // https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/8547
-                    // DetectAdbConfig 会把 ConnectAddress 变成第一个不是 emulator 开头的地址，可能会存在多开问题
-                    error = string.Empty;
-                }
-                else
+                if (!AutoDetectConnection(ref error))
                 {
                     return false;
                 }
@@ -1849,19 +1815,58 @@ namespace MaaWpfGui.Main
                 }
             }
 
-            if (ret)
-            {
-                if (!Instances.SettingsViewModel.AlwaysAutoDetectConnection)
-                {
-                    Instances.SettingsViewModel.AutoDetectConnection = false;
-                }
-            }
-            else
+            if (!ret)
             {
                 error = LocalizationHelper.GetString("ConnectFailed") + "\n" + LocalizationHelper.GetString("CheckSettings");
             }
+            else if (Instances.SettingsViewModel.AutoDetectConnection && !Instances.SettingsViewModel.AlwaysAutoDetectConnection)
+            {
+                Instances.SettingsViewModel.AutoDetectConnection = false;
+            }
 
             return ret;
+        }
+
+        private static bool AutoDetectConnection(ref string error)
+        {
+            string bsHvAddress = Instances.SettingsViewModel.TryToSetBlueStacksHyperVAddress();
+
+            // tcp连接测试端口是否有效，超时时间500ms
+            // 如果是本地设备，没有冒号
+            bool adbResult =
+                (!Instances.SettingsViewModel.ConnectAddress.Contains(':') &&
+                 !string.IsNullOrEmpty(Instances.SettingsViewModel.ConnectAddress)) ||
+                IfPortEstablished(Instances.SettingsViewModel.ConnectAddress);
+
+            if (adbResult)
+            {
+                error = string.Empty;
+                return true;
+            }
+
+            bool bsResult = IfPortEstablished(bsHvAddress);
+
+            if (bsResult)
+            {
+                error = string.Empty;
+                if (string.IsNullOrEmpty(Instances.SettingsViewModel.AdbPath) && Instances.SettingsViewModel.DetectAdbConfig(ref error))
+                {
+                    return string.IsNullOrEmpty(error);
+                }
+                Instances.SettingsViewModel.ConnectAddress = bsHvAddress;
+                return true;
+            }
+
+
+            if (Instances.SettingsViewModel.DetectAdbConfig(ref error))
+            {
+                // https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/8547
+                // DetectAdbConfig 会把 ConnectAddress 变成第一个不是 emulator 开头的地址，可能会存在多开问题
+                error = string.Empty;
+                return true;
+            }
+
+            return false;
         }
 
         private AsstTaskId AsstAppendTaskWithEncoding(string type, JObject? taskParams = null)
@@ -1899,8 +1904,7 @@ namespace MaaWpfGui.Main
             Depot,
             OperBox,
             Gacha,
-            ReclamationAlgorithm,
-            ReclamationAlgorithm2,
+            Reclamation,
             Custom,
         }
 
@@ -2045,14 +2049,18 @@ namespace MaaWpfGui.Main
             return id != 0;
         }
 
-        public bool AsstAppendCloseDown()
+        public bool AsstAppendCloseDown(string clientType)
         {
+            var taskParams = new JObject
+            {
+                ["client_type"] = clientType,
+            };
             if (!AsstStop())
             {
                 _logger.Warning("Failed to stop Asst");
             }
 
-            AsstTaskId id = AsstAppendTaskWithEncoding("CloseDown");
+            AsstTaskId id = AsstAppendTaskWithEncoding("CloseDown", taskParams);
             _latestTaskId[TaskType.CloseDown] = id;
             return id != 0;
         }
@@ -2060,10 +2068,11 @@ namespace MaaWpfGui.Main
         /// <summary>
         /// <c>CloseDown</c> 任务。
         /// </summary>
+        /// <param name="clientType">客户端版本。</param>
         /// <returns>是否成功。</returns>
-        public bool AsstStartCloseDown()
+        public bool AsstStartCloseDown(string clientType)
         {
-            return AsstAppendCloseDown() && AsstStart();
+            return AsstAppendCloseDown(clientType) && AsstStart();
         }
 
         public bool AsstBackToHome()
@@ -2428,30 +2437,32 @@ namespace MaaWpfGui.Main
         /// <summary>
         /// 自动生息演算。
         /// </summary>
+        /// <param name="theme">生息演算主题["Tales"]</param>
+        /// <param name="mode">
+        /// 策略。可用值包括：
+        /// <list type="bullet">
+        ///     <item>
+        ///         <term><c>0</c></term>
+        ///         <description>无存档时通过进出关卡刷生息点数</description>
+        ///     </item>
+        ///     <item>
+        ///         <term><c>1</c></term>
+        ///         <description>有存档时通过合成支援道具刷生息点数</description>
+        ///     </item>
+        /// </list>
+        /// </param>
+        /// <param name="toolToCraft">要合成的支援道具。</param>
         /// <returns>是否成功。</returns>
-        public bool AsstAppendReclamation()
-        {
-            AsstTaskId id = AsstAppendTaskWithEncoding("ReclamationAlgorithm");
-            _latestTaskId[TaskType.ReclamationAlgorithm] = id;
-            return id != 0;
-        }
-
-        /// <summary>
-        /// 自动生息演算。
-        /// </summary>
-        /// <param name="mode">是否通过制造刷点数。</param>
-        /// <param name="product">制造产物。</param>
-        /// <returns>是否成功。</returns>
-        public bool AsstAppendReclamation2(int mode = 0, string product = "")
+        public bool AsstAppendReclamation(string theme = "Tales", int mode = 1, string toolToCraft = "荧光棒")
         {
             var taskParams = new JObject
             {
-                ["theme"] = 1,
+                ["theme"] = theme,
                 ["mode"] = mode,
-                ["product"] = product,
+                ["tool_to_craft"] = toolToCraft,
             };
-            AsstTaskId id = AsstAppendTaskWithEncoding("ReclamationAlgorithm", taskParams);
-            _latestTaskId[TaskType.ReclamationAlgorithm2] = id;
+            AsstTaskId id = AsstAppendTaskWithEncoding("Reclamation", taskParams);
+            _latestTaskId[TaskType.Reclamation] = id;
             return id != 0;
         }
 

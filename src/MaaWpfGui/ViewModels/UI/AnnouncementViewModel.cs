@@ -43,7 +43,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _doNotRemindThisAnnouncementAgain = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.DoNotRemindThisAnnouncementAgain, bool.FalseString));
+        private bool _doNotRemindThisAnnouncementAgain = Convert.ToBoolean(ConfigurationHelper.GetGlobalValue(ConfigurationKeys.DoNotRemindThisAnnouncementAgain, bool.FalseString));
 
         public bool DoNotRemindThisAnnouncementAgain
         {
@@ -51,11 +51,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _doNotRemindThisAnnouncementAgain, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.DoNotRemindThisAnnouncementAgain, value.ToString());
+                ConfigurationHelper.SetGlobalValue(ConfigurationKeys.DoNotRemindThisAnnouncementAgain, value.ToString());
             }
         }
 
-        private bool _doNotShowAnnouncement = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.DoNotShowAnnouncement, bool.FalseString));
+        private bool _doNotShowAnnouncement = Convert.ToBoolean(ConfigurationHelper.GetGlobalValue(ConfigurationKeys.DoNotShowAnnouncement, bool.FalseString));
 
         /// <summary>
         /// Gets or sets a value indicating whether to show the update.
@@ -66,7 +66,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _doNotShowAnnouncement, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.DoNotShowAnnouncement, value.ToString());
+                ConfigurationHelper.SetGlobalValue(ConfigurationKeys.DoNotShowAnnouncement, value.ToString());
             }
         }
 

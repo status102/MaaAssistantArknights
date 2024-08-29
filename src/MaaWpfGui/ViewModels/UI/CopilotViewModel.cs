@@ -115,7 +115,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// <param name="content">The content.</param>
         /// <param name="color">The font color.</param>
         /// <param name="weight">The font weight.</param>
-        /// <param name="showTime">Wether show time.</param>
+        /// <param name="showTime">Whether show time.</param>
         public void AddLog(string content, string color = UiLogColor.Trace, string weight = "Regular", bool showTime = true)
         {
             Execute.OnUIThread(() =>
@@ -373,11 +373,15 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 AddLog(string.Empty, UiLogColor.Message, showTime: false);
+                AddLog("------------------------------------------------", UiLogColor.Message, showTime: false);
+                AddLog(string.Empty, UiLogColor.Message, showTime: false);
+
                 int count = 0;
                 foreach (var oper in json["opers"] ?? new JArray())
                 {
                     count++;
-                    AddLog($"{oper["name"]}, {oper["skill"]} 技能", UiLogColor.Message, showTime: false);
+                    var localizedName = DataHelper.GetLocalizedCharacterName((string?)oper["name"]);
+                    AddLog($"{localizedName}, {LocalizationHelper.GetString("CopilotSkill")} {oper["skill"]}", UiLogColor.Message, showTime: false);
                 }
 
                 if (json.TryGetValue("groups", out var groupsValue))
@@ -386,13 +390,14 @@ namespace MaaWpfGui.ViewModels.UI
                     {
                         count++;
                         string groupName = group["name"] + ": ";
-                        var operInfos = group["opers"]!.Cast<JObject>().Select(oper => $"{oper["name"]} {oper["skill"]}").ToList();
+                        var operInfos = group["opers"]!.Cast<JObject>()
+                            .Select(oper => $"{DataHelper.GetLocalizedCharacterName((string?)oper["name"])} {oper["skill"]}").ToList();
 
                         AddLog(groupName + string.Join(" / ", operInfos), UiLogColor.Message, showTime: false);
                     }
                 }
 
-                AddLog($"共 {count} 名干员", UiLogColor.Message, showTime: false);
+                AddLog(string.Format(LocalizationHelper.GetString("TotalOperatorsCount"), count), UiLogColor.Message, showTime: false);
 
                 if (json.TryGetValue("type", out var typeValue))
                 {
@@ -401,19 +406,29 @@ namespace MaaWpfGui.ViewModels.UI
                     {
                         _taskType = "SSSCopilot";
 
+                        if (json.TryGetValue("buff", out var buffValue))
+                        {
+                            string buffLog = LocalizationHelper.GetString("DirectiveECTerm");
+                            string? localizedBuffName = DataHelper.GetLocalizedCharacterName((string?)buffValue);
+                            AddLog(buffLog + (string.IsNullOrEmpty(localizedBuffName) ? (string?)buffValue : localizedBuffName), UiLogColor.Message, showTime: false);
+                        }
+
                         if (json.TryGetValue("tool_men", out var toolMenValue))
                         {
-                            AddLog("编队工具人：\n" + toolMenValue, UiLogColor.Message, showTime: false);
+                            string toolMenLog = LocalizationHelper.GetString("OtherOperators");
+                            AddLog(toolMenLog + toolMenValue, UiLogColor.Message, showTime: false);
                         }
 
                         if (json.TryGetValue("equipment", out var equipmentValue) && equipmentValue is JArray equipmentJArray)
                         {
-                            AddLog("开局装备（横向）：\n" + string.Join('\n', equipmentJArray.Select(i => (string?)i).Chunk(4).Select(i => string.Join(",", i))), UiLogColor.Message, showTime: false);
+                            string equipmentLog = LocalizationHelper.GetString("InitialEquipmentHorizontal") + '\n';
+                            AddLog(equipmentLog + string.Join('\n', equipmentJArray.Select(i => (string?)i).Chunk(4).Select(i => string.Join(",", i))), UiLogColor.Message, showTime: false);
                         }
 
                         if (json.TryGetValue("strategy", out var strategyValue))
                         {
-                            AddLog("开局策略：" + strategyValue, UiLogColor.Message, showTime: false);
+                            string strategyLog = LocalizationHelper.GetString("InitialStrategy");
+                            AddLog(strategyLog + strategyValue, UiLogColor.Message, showTime: false);
                         }
                     }
                 }
@@ -430,24 +445,26 @@ namespace MaaWpfGui.ViewModels.UI
                 File.Delete(TempCopilotFile);
                 File.WriteAllText(TempCopilotFile, json.ToString());
 
-                if (_taskType == "Copilot" && UseCopilotList)
+                if (_taskType != "Copilot" || !UseCopilotList)
                 {
-                    var value = json["difficulty"];
-                    var diff = value?.Type == JTokenType.Integer ? (int)value : 0;
-                    switch (diff)
-                    {
-                        case 0:
-                        case 1:
-                            AddCopilotTask();
-                            break;
-                        case 2:
-                            AddCopilotTask_Adverse();
-                            break;
-                        case 3:
-                            AddCopilotTask();
-                            AddCopilotTask_Adverse();
-                            break;
-                    }
+                    return;
+                }
+
+                var value = json["difficulty"];
+                var diff = value?.Type == JTokenType.Integer ? (int)value : 0;
+                switch (diff)
+                {
+                    case 0:
+                    case 1:
+                        AddCopilotTask();
+                        break;
+                    case 2:
+                        AddCopilotTask_Adverse();
+                        break;
+                    case 3:
+                        AddCopilotTask();
+                        AddCopilotTask_Adverse();
+                        break;
                 }
             }
             catch (Exception)
@@ -458,20 +475,6 @@ namespace MaaWpfGui.ViewModels.UI
 
         private async Task ParseCopilotSet(string jsonStr)
         {
-            void Log(string? name, string? description)
-            {
-                ClearLog();
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    AddLog(name, UiLogColor.Message, showTime: false);
-                }
-
-                if (!string.IsNullOrWhiteSpace(description))
-                {
-                    AddLog(description, UiLogColor.Message, showTime: false);
-                }
-            }
-
             UseCopilotList = true;
             IsCopilotSet = false;
             try
@@ -503,6 +506,22 @@ namespace MaaWpfGui.ViewModels.UI
             catch (Exception)
             {
                 AddLog(LocalizationHelper.GetString("CopilotJsonError"), UiLogColor.Error, showTime: false);
+            }
+
+            return;
+
+            void Log(string? name, string? description)
+            {
+                ClearLog();
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    AddLog(name, UiLogColor.Message, showTime: false);
+                }
+
+                if (!string.IsNullOrWhiteSpace(description))
+                {
+                    AddLog(description, UiLogColor.Message, showTime: false);
+                }
             }
         }
 

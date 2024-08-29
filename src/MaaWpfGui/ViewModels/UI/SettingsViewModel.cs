@@ -381,7 +381,12 @@ namespace MaaWpfGui.ViewModels.UI
             get => _remoteControlGetTaskEndpointUri;
             set
             {
-                SetAndNotify(ref _remoteControlGetTaskEndpointUri, value);
+                if (!SetAndNotify(ref _remoteControlGetTaskEndpointUri, value))
+                {
+                    return;
+                }
+
+                Instances.RemoteControlService.InitializePollJobTask();
                 ConfigurationHelper.SetValue(ConfigurationKeys.RemoteControlGetTaskEndpointUri, value);
             }
         }
@@ -443,7 +448,8 @@ namespace MaaWpfGui.ViewModels.UI
             new CombinedData { Display = "Telegram", Value = "Telegram" },
             new CombinedData { Display = "Discord", Value = "Discord" },
             new CombinedData { Display = "SMTP", Value = "SMTP" },
-            new CombinedData { Display = "Bark", Value = "Bark" }
+            new CombinedData { Display = "Bark", Value = "Bark" },
+            new CombinedData { Display = "Qmsg", Value = "Qmsg" }
         ];
 
         private string _enabledExternalNotificationProvider = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationEnabled, "Off");
@@ -635,6 +641,54 @@ namespace MaaWpfGui.ViewModels.UI
             {
                 SetAndNotify(ref _telegramChatId, value);
                 ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationTelegramChatId, value);
+            }
+        }
+
+        private string _qmsgServer = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationQmsgServer, string.Empty);
+
+        public string QmsgServer
+        {
+            get => _qmsgServer;
+            set
+            {
+                SetAndNotify(ref _qmsgServer, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationQmsgServer, value);
+            }
+        }
+
+        private string _qmsgKey = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationQmsgKey, string.Empty);
+
+        public string QmsgKey
+        {
+            get => _qmsgKey;
+            set
+            {
+                SetAndNotify(ref _qmsgKey, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationQmsgKey, value);
+            }
+        }
+
+        private string _qmsgUser = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationQmsgUser, string.Empty);
+
+        public string QmsgUser
+        {
+            get => _qmsgUser;
+            set
+            {
+                SetAndNotify(ref _qmsgUser, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationQmsgUser, value);
+            }
+        }
+
+        private string _qmsgBot = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationQmsgBot, string.Empty);
+
+        public string QmsgBot
+        {
+            get => _qmsgBot;
+            set
+            {
+                SetAndNotify(ref _qmsgBot, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationQmsgBot, value);
             }
         }
 
@@ -1376,7 +1430,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private string _clientType = ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, "Official");
+        private string _clientType = ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, string.Empty);
 
         /// <summary>
         /// Gets or sets the client type.
@@ -2014,7 +2068,7 @@ namespace MaaWpfGui.ViewModels.UI
                             continue;
                         }
 
-                        var localizedName = DataHelper.GetLocalizedCharacterName(name, _language);
+                        var localizedName = DataHelper.GetLocalizedCharacterName(name, OperNameLocalization);
                         if (!string.IsNullOrEmpty(localizedName) && !(_clientType.Contains("YoStar") && DataHelper.GetLocalizedCharacterName(name, "en-us") == DataHelper.GetLocalizedCharacterName(name, "zh-cn")))
                         {
                             roguelikeCoreCharList.Add(localizedName);
@@ -2479,27 +2533,62 @@ namespace MaaWpfGui.ViewModels.UI
 
         #region 生息演算设置
 
-        private bool _reclamation2ExEnable = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.Reclamation2ExEnable, bool.FalseString));
+        /// <summary>
+        /// Gets the list of reclamation themes.
+        /// </summary>
+        public List<CombinedData> ReclamationThemeList { get; } =
+            [
+                new() { Display = LocalizationHelper.GetString("ReclamationThemeTales"), Value = "Tales" },
+            ];
 
-        public bool Reclamation2ExEnable
+        private string _reclamationTheme = ConfigurationHelper.GetValue(ConfigurationKeys.ReclamationMode, "Tales");
+
+        /// <summary>
+        /// Gets or sets the Reclamation theme.
+        /// </summary>
+        public string ReclamationTheme
         {
-            get => _reclamation2ExEnable;
+            get => _reclamationTheme;
             set
             {
-                SetAndNotify(ref _reclamation2ExEnable, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.Reclamation2ExEnable, value.ToString());
+                SetAndNotify(ref _reclamationTheme, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ReclamationTheme, value);
             }
         }
 
-        private string _reclamation2ExProduct = ConfigurationHelper.GetValue(ConfigurationKeys.Reclamation2ExProduct, string.Empty);
+        /// <summary>
+        /// Gets the list of reclamation modes.
+        /// </summary>
+        public List<CombinedData> ReclamationModeList { get; } =
+            [
+                new() { Display = LocalizationHelper.GetString("ReclamationModeProsperityNoSave"), Value = "0" },
+                new() { Display = LocalizationHelper.GetString("ReclamationModeProsperityInSave"), Value = "1" },
+            ];
 
-        public string Reclamation2ExProduct
+        private string _reclamationMode = ConfigurationHelper.GetValue(ConfigurationKeys.ReclamationMode, "1");
+
+        /// <summary>
+        /// Gets or sets 策略，无存档刷生息点数 / 有存档刷生息点数
+        /// </summary>
+        public string ReclamationMode
         {
-            get => _reclamation2ExProduct;
+            get => _reclamationMode;
             set
             {
-                SetAndNotify(ref _reclamation2ExProduct, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.Reclamation2ExProduct, value);
+                SetAndNotify(ref _reclamationMode, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ReclamationMode, value);
+            }
+        }
+
+        private string _reclamationToolToCraft = ConfigurationHelper.GetValue(ConfigurationKeys.ReclamationToolToCraft, "荧光棒");
+
+        public string ReclamationToolToCraft
+        {
+            get => _reclamationToolToCraft;
+            set
+            {
+                SetAndNotify(ref _reclamationToolToCraft, value);
+                ConfigurationHelper.SetValue(ConfigurationKeys.ReclamationToolToCraft, value);
             }
         }
 
@@ -3459,7 +3548,7 @@ namespace MaaWpfGui.ViewModels.UI
         /// </summary>
         public static string UiVersion { get; } = _uiVersion == "0.0.1" ? "DEBUG VERSION" : _uiVersion;
 
-        private static string _resourceVersion = GetResourceVersionByClientType(ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, "Official"));
+        private static string _resourceVersion = GetResourceVersionByClientType(ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, string.Empty));
 
         /// <summary>
         /// Gets or sets the resource version.
@@ -3619,6 +3708,24 @@ namespace MaaWpfGui.ViewModels.UI
             {
                 SetAndNotify(ref _proxy, value);
                 ConfigFactory.Root.VersionUpdate.Proxy = value;
+            }
+        }
+
+        public List<CombinedData> ProxyTypeList { get; } =
+            [
+                new() { Display = "HTTP Proxy", Value = "http" },
+                new() { Display = "Socks5 Proxy", Value = "socks5" },
+            ];
+
+        private string _proxyType = ConfigurationHelper.GetGlobalValue(ConfigurationKeys.ProxyType, "http");
+
+        public string ProxyType
+        {
+            get => _proxyType;
+            set
+            {
+                SetAndNotify(ref _proxyType, value);
+                ConfigurationHelper.SetGlobalValue(ConfigurationKeys.ProxyType, value);
             }
         }
 
@@ -3785,8 +3892,17 @@ namespace MaaWpfGui.ViewModels.UI
             get => _autoDetectConnection;
             set
             {
-                SetAndNotify(ref _autoDetectConnection, value);
+                if (!SetAndNotify(ref _autoDetectConnection, value))
+                {
+                    return;
+                }
+
                 ConfigurationHelper.SetValue(ConfigurationKeys.AutoDetect, value.ToString());
+
+                if (value)
+                {
+                    Instances.AsstProxy.Connected = false;
+                }
             }
         }
 
@@ -4418,13 +4534,13 @@ namespace MaaWpfGui.ViewModels.UI
         {
             if (string.IsNullOrEmpty(_bluestacksConfig))
             {
-                return null;
+                return string.Empty;
             }
 
             if (!File.Exists(_bluestacksConfig))
             {
                 ConfigurationHelper.SetValue(ConfigurationKeys.BluestacksConfigError, "File not exists");
-                return null;
+                return string.Empty;
             }
 
             var allLines = File.ReadAllLines(_bluestacksConfig);
@@ -4612,6 +4728,15 @@ namespace MaaWpfGui.ViewModels.UI
         public List<CombinedData> LanguageList { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of operator name language settings
+        /// </summary>
+        public List<CombinedData> OperNameLanguageModeList { get; set; } =
+            [
+                new() { Display = LocalizationHelper.GetString("OperNameLanguageMAA"), Value = "OperNameLanguageMAA" },
+                new() { Display = LocalizationHelper.GetString("OperNameLanguageClient"), Value = "OperNameLanguageClient" }
+            ];
+
+        /// <summary>
         /// Gets the list of dark mode.
         /// </summary>
         public List<GenericCombinedData<DarkModeType>> DarkModeList { get; } =
@@ -4641,6 +4766,11 @@ namespace MaaWpfGui.ViewModels.UI
             get => _useTray;
             set
             {
+                if (!value)
+                {
+                    MinimizeToTray = false;
+                }
+
                 SetAndNotify(ref _useTray, value);
                 ConfigurationHelper.SetValue(ConfigurationKeys.UseTray, value.ToString());
                 Instances.MainWindowManager.SetUseTrayIcon(value);
@@ -4659,7 +4789,7 @@ namespace MaaWpfGui.ViewModels.UI
             {
                 SetAndNotify(ref _minimizeToTray, value);
                 ConfigFactory.CurrentConfig.GUI.MinimizeToTray = value;
-                Instances.MainWindowManager.SetMinimizeToTaskBar(value);
+                Instances.MainWindowManager.SetMinimizeToTray(value);
             }
         }
 
@@ -4915,6 +5045,7 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 SetAndNotify(ref _language, value);
+
                 return;
 
                 string FormatText(string text, string key)
@@ -4931,6 +5062,106 @@ namespace MaaWpfGui.ViewModels.UI
             {
                 var language = (string)Application.Current.Resources["Language"];
                 return language == "Language" ? language : language + " / Language";
+            }
+        }
+
+        private static readonly Dictionary<string, string> _clientLanguageMapper = new()
+        {
+            { string.Empty, "zh-cn" },
+            { "Official", "zh-cn" },
+            { "Bilibili", "zh-cn" },
+            { "YoStarEN", "en-us" },
+            { "YoStarJP", "ja-jp" },
+            { "YoStarKR", "ko-kr" },
+            { "txwy", "zh-tw" },
+        };
+
+        /// <summary>
+        /// Opername display language, can set force display when it was set as "OperNameLanguageForce.en-us"
+        /// </summary>
+        private string _operNameLanguage = ConfigurationHelper.GetValue(ConfigurationKeys.OperNameLanguage, "OperNameLanguageMAA");
+
+        public string OperNameLanguage
+        {
+            get
+            {
+                if (!_operNameLanguage.Contains('.'))
+                {
+                    return _operNameLanguage;
+                }
+
+                if (_operNameLanguage.Split('.')[0] != "OperNameLanguageForce" || !LocalizationHelper.SupportedLanguages.ContainsKey(_operNameLanguage.Split('.')[1]))
+                {
+                    return _operNameLanguage;
+                }
+
+                OperNameLanguageModeList.Add(new CombinedData { Display = LocalizationHelper.GetString("OperNameLanguageForce"), Value = "OperNameLanguageForce" });
+                return "OperNameLanguageForce";
+            }
+
+            set
+            {
+                if (value == _operNameLanguage.Split('.')[0])
+                {
+                    return;
+                }
+
+                switch (value)
+                {
+                    case "OperNameLanguageClient":
+                        ConfigurationHelper.SetValue(ConfigurationKeys.OperNameLanguage, value);
+                        break;
+                    case "OperNameLanguageMAA":
+                    default:
+                        ConfigurationHelper.SetValue(ConfigurationKeys.OperNameLanguage, "OperNameLanguageMAA");
+                        break;
+                }
+
+                var mainWindow = Application.Current.MainWindow;
+
+                if (mainWindow != null)
+                {
+                    mainWindow.Show();
+                    mainWindow.WindowState = mainWindow.WindowState = WindowState.Normal;
+                    mainWindow.Activate();
+                }
+
+                var result = MessageBoxHelper.Show(
+                    LocalizationHelper.GetString("LanguageChangedTip"),
+                    LocalizationHelper.GetString("Tip"),
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Question,
+                    ok: LocalizationHelper.GetString("Ok"),
+                    cancel: LocalizationHelper.GetString("ManualRestart"));
+                if (result == MessageBoxResult.OK)
+                {
+                    Bootstrapper.ShutdownAndRestartWithoutArgs();
+                }
+
+                SetAndNotify(ref _operNameLanguage, value);
+            }
+        }
+
+        public string OperNameLocalization
+        {
+            get
+            {
+                if (_operNameLanguage == "OperNameLanguageClient")
+                {
+                    return _clientLanguageMapper[_clientType];
+                }
+
+                if (!_operNameLanguage.Contains('.'))
+                {
+                    return _language;
+                }
+
+                if (_operNameLanguage.Split('.')[0] == "OperNameLanguageForce" && LocalizationHelper.SupportedLanguages.ContainsKey(_operNameLanguage.Split('.')[1]))
+                {
+                    return _operNameLanguage.Split('.')[1];
+                }
+
+                return _language;
             }
         }
 

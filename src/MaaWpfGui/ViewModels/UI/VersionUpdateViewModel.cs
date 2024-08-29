@@ -236,6 +236,7 @@ namespace MaaWpfGui.ViewModels.UI
                 {
                     File.Delete("MAA_win7.exe");
                 }
+
                 if (File.Exists("启动旧版.cmd"))
                 {
                     File.Delete("启动旧版.cmd");
@@ -421,7 +422,7 @@ namespace MaaWpfGui.ViewModels.UI
             Native,
         }
 
-        private bool _doNotShowUpdate = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.VersionUpdateDoNotShowUpdate, bool.FalseString));
+        private bool _doNotShowUpdate = Convert.ToBoolean(ConfigurationHelper.GetGlobalValue(ConfigurationKeys.VersionUpdateDoNotShowUpdate, bool.FalseString));
 
         /// <summary>
         /// Gets or sets a value indicating whether to show the update.
@@ -432,7 +433,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _doNotShowUpdate, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.VersionUpdateDoNotShowUpdate, value.ToString());
+                ConfigurationHelper.SetGlobalValue(ConfigurationKeys.VersionUpdateDoNotShowUpdate, value.ToString());
             }
         }
 
@@ -538,8 +539,7 @@ namespace MaaWpfGui.ViewModels.UI
                         {
                             Process.Start(new ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
                         }
-                    }
-                );
+                    });
                 _ = Execute.OnUIThreadAsync(() =>
                 {
                     using var toast = new ToastNotification((otaFound ? LocalizationHelper.GetString("NewVersionFoundTitle") : LocalizationHelper.GetString("NewVersionFoundButNoPackageTitle")) + " : " + UpdateTag);
@@ -700,6 +700,8 @@ namespace MaaWpfGui.ViewModels.UI
                 await Bootstrapper.RestartAfterIdleAsync();
                 return;
             }
+
+            await _runningState.UntilIdleAsync(10000);
 
             var result = MessageBoxHelper.Show(
                 LocalizationHelper.GetString("NewVersionDownloadCompletedDesc"),
@@ -960,7 +962,7 @@ namespace MaaWpfGui.ViewModels.UI
             // match case 1: DEBUG VERSION
             // match case 2: v{Major}.{Minor}.{Patch}-{CommitDistance}-g{CommitHash}
             // match case 3: {CommitHash}
-            return Regex.IsMatch(version, @"^(.*DEBUG.*|v\d+(\.\d+){1,3}-\d+-g[0-9a-f]{7,}|[^v][0-9a-f]{7,})$");
+            return Regex.IsMatch(version, @"^(.*DEBUG.*|v\d+(\.\d+){1,3}-\d+-g[0-9a-f]{6,}|[^v][0-9a-f]{6,})$");
         }
 
         public bool IsStdVersion(string? version = null)

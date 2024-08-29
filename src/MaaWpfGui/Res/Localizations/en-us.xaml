@@ -8,11 +8,11 @@
     <system:String x:Key="AdvancedSettings">Advanced</system:String>
     <system:String x:Key="PerformanceSettings">Performance</system:String>
     <system:String x:Key="GameSettings">Client</system:String>
-    <system:String x:Key="BaseSettings">Base</system:String>
+    <system:String x:Key="BaseSettings">Base Setting</system:String>
     <system:String x:Key="RoguelikeSettings">I.S.</system:String>
-    <system:String x:Key="RecruitingSettings">Recruit</system:String>
-    <system:String x:Key="MallSettings">Credit</system:String>
-    <system:String x:Key="OtherCombatSettings">Combat</system:String>
+    <system:String x:Key="RecruitingSettings">Auto Recruit</system:String>
+    <system:String x:Key="MallSettings">Credit Related</system:String>
+    <system:String x:Key="OtherCombatSettings">Combat Setting</system:String>
     <system:String x:Key="ConnectionSettings">Connection</system:String>
     <system:String x:Key="StartupSettings">Startup</system:String>
     <system:String x:Key="ScheduleSettings">Schedule</system:String>
@@ -48,6 +48,10 @@
     <system:String x:Key="ExternalNotificationDiscordUserId">User ID</system:String>
     <system:String x:Key="ExternalNotificationTelegramBotToken">Bot Token</system:String>
     <system:String x:Key="ExternalNotificationTelegramChatId">Chat ID</system:String>
+    <system:String x:Key="ExternalNotificationQmsgServer">Qmsg Server</system:String>
+    <system:String x:Key="ExternalNotificationQmsgKey">Qmsg Key</system:String>
+    <system:String x:Key="ExternalNotificationQmsgUser">User QQ</system:String>
+    <system:String x:Key="ExternalNotificationQmsgBot">Bot QQ</system:String>
     <system:String x:Key="UseGpuForInference">Use GPU for inference acceleration</system:String>
     <system:String x:Key="GpuOptionDisable">Don’t use</system:String>
     <system:String x:Key="GpuOptionSystemDefault">System default GPU</system:String>
@@ -130,15 +134,15 @@
     <system:String x:Key="RoguelikeOnlyStartWithEliteTwo">Only Repeat for「Starting Operator」Elite 2, No Battle</system:String>
     <system:String x:Key="Roguelike3FirstFloorFoldartal">Repeat for foldartal foreseed first floor，No Battle</system:String>
     <system:String x:Key="Roguelike3NewSquad2StartingFoldartal">Start with "Life Prioritizing Squad" and acquire the cypherboard</system:String>
-    <system:String x:Key="Roguelike3NewSquad2StartingFoldartalTip">Write up to three and separate with ;</system:String>
+    <system:String x:Key="Roguelike3NewSquad2StartingFoldartalTip">Write up to three and separate with ";"</system:String>
     <system:String x:Key="RoguelikeUseSupportUnit">Select 「Starting Operator」 from support unit list</system:String>
     <system:String x:Key="RoguelikeUseNonFriendSupport">Enable non-friend support</system:String>
     <system:String x:Key="RoguelikeDelayAbortUntilCombatComplete">Don't abort Auto IS until the end of battle</system:String>
     <system:String x:Key="RoguelikeStopAtFinalBoss">Stop before final boss</system:String>
-    <system:String x:Key="DeploymentWithPause" xml:space="preserve">Deployment with Pause (Pause-Trick) (Works for IS, Copilot and SSS) (Beta function, Not recommended yet)</system:String>
+    <system:String x:Key="DeploymentWithPause" xml:space="preserve">Pause Deployment (Pause Trick) (Experimental)</system:String>
     <system:String x:Key="AdbLiteEnabled">Use ADB Lite (Experimental)</system:String>
     <system:String x:Key="KillAdbOnExit">Kill ADB On Exit</system:String>
-    <system:String x:Key="DefaultSquad">Default</system:String>
+    <system:String x:Key="DefaultSquad">Default Squad</system:String>
     <system:String x:Key="IS2NewSquad1">Mind Over Matter Squad</system:String>
     <system:String x:Key="IS2NewSquad2">Resourceful Squad</system:String>
     <system:String x:Key="IS2NewSquad3">People-Oriented Squad</system:String>
@@ -160,7 +164,7 @@
     <system:String x:Key="TacticalDestructionOperative">Tactical Destruction Squad</system:String>
     <system:String x:Key="ResearchSquad">Research Squad</system:String>
     <system:String x:Key="First-ClassSquad">First-Class Squad</system:String>
-    <system:String x:Key="DefaultRoles">Default</system:String>
+    <system:String x:Key="DefaultRoles">Default Roles</system:String>
     <system:String x:Key="FirstMoveAdvantage">First Move Advantage</system:String>
     <system:String x:Key="SlowAndSteadyWinsTheRace">Slow and Steady Wins the Race</system:String>
     <system:String x:Key="OvercomingYourWeaknesses">Overcoming Your Weaknesses</system:String>
@@ -290,7 +294,7 @@ You can cancel this popup by clicking the Settings - About Us - Issue Reporting 
     <system:String x:Key="RoguelikeThemePhantom">Phantom</system:String>
     <system:String x:Key="RoguelikeThemeMizuki">Mizuki</system:String>
     <system:String x:Key="RoguelikeThemeSami">Sami</system:String>
-    <system:String x:Key="RoguelikeSarkaz">Sarkaz</system:String>
+    <system:String x:Key="RoguelikeThemeSarkaz">Sarkaz</system:String>
     <system:String x:Key="Strategy">Strategy</system:String>
     <system:String x:Key="StartTimesLimit">Stops after starting N times</system:String>
     <system:String x:Key="GoldTimesLimit">Stops after investing N times</system:String>
@@ -373,7 +377,7 @@ Only supports Official(CN) and Bilibili server. Login account is not supported.<
     <system:String x:Key="ScreenshotTest">Screenshot test</system:String>
     <system:String x:Key="MuMu12ExtrasEnabled">Enable MuMu's screenshot enhancement mode</system:String>
     <system:String x:Key="MuMu12ExtrasEnabledTip">
-        MuMu 12 3.8.13 and later is required, not supported by MuMu 12 Arknights edition/Global.\n
+        MuMu 12 V4.0.0 and later is required, not supported by MuMu 12 Global.\n
         It is strongly recommended to perform a screenshot test before using this feature for the first time after enabling it.\n\n
         Please fill in the following information:\n\n
         1. Emulator Path: (e.g., C:\\Program Files\\Netease\\MuMuPlayer-12.0)\n
@@ -399,20 +403,27 @@ Only supports Official(CN) and Bilibili server. Login account is not supported.<
     <!--  Farming  -->
     <system:String x:Key="Farming">Farming</system:String>
     <system:String x:Key="WakeUp">Login</system:String>
-    <system:String x:Key="Recruiting">Recruit</system:String>
+    <system:String x:Key="Recruiting">Auto Recruit</system:String>
     <system:String x:Key="Base">Base</system:String>
     <system:String x:Key="Combat">Combat</system:String>
     <system:String x:Key="Visiting">Visit Friends</system:String>
     <system:String x:Key="Mall">Credit Store</system:String>
     <system:String x:Key="Mission">Collect Rewards</system:String>
     <system:String x:Key="AutoRoguelike">Auto I.S.</system:String>
-    <system:String x:Key="ReclamationAlgorithm">Reclamation Algorithm</system:String>
-    <system:String x:Key="ReclamationAlgorithm2">Reclamation Algorithm 2</system:String>
+    <system:String x:Key="Reclamation">Reclamation Algorithm</system:String>
+    <system:String x:Key="ReclamationTheme">Reclamation Algorithm Theme</system:String>
+    <system:String x:Key="ReclamationThemeTales">Tales Within The Sand</system:String>
+    <system:String x:Key="ReclamationModeProsperityNoSave">I do not have a save, let's farm prosperity points by repeatedly entering and exiting stages.</system:String>
+    <system:String x:Key="ReclamationModeProsperityInSave">I do have a save, let's farm prosperity points by crafting tools.</system:String>
+    <system:String x:Key="OperNameLanguage">Operator display language</system:String>
+    <system:String x:Key="OperNameLanguageMAA">Follow MAA</system:String>
+    <system:String x:Key="OperNameLanguageClient">Follow game client</system:String>
+    <system:String x:Key="OperNameLanguageForce">Force use of specified language</system:String>
     <system:String x:Key="Light">Light</system:String>
     <system:String x:Key="Dark">Dark</system:String>
     <system:String x:Key="SyncWithOs">Sync with OS</system:String>
     <system:String x:Key="SelectAll">Select All</system:String>
-    <system:String x:Key="Inverse">Inverse</system:String>
+    <system:String x:Key="Inverse">Invert</system:String>
     <system:String x:Key="Clear">Clear</system:String>
     <system:String x:Key="PostActions">Then</system:String>
     <system:String x:Key="DoNothing">Do Nothing</system:String>
@@ -523,7 +534,8 @@ Only supports Official(CN) and Bilibili server. Login account is not supported.<
     <!--  Operator Recognition  -->
     <system:String x:Key="OperBoxRecognition">Operator</system:String>
     <system:String x:Key="OperBoxRecognitionTip">"Marked" operators can't be recognized. Please unmark them before starting.\nThis function is still in testing. If you encounter any unexpected results, please zip the 「debug/oper」 folder in the installation path and submit an issue on GitHub</system:String>
-    <system:String x:Key="OperBoxRecognitionResult">Not owned: {0}\n\n{1}\n\nOwned: {2}\n\n{3}</system:String>
+    <system:String x:Key="OperBoxHaveList">Owned: {0}</system:String>
+    <system:String x:Key="OperBoxNotHaveList">Not owned: {0}</system:String>
     <system:String x:Key="StartToOperBoxRecognition">Start to Identify</system:String>
     <system:String x:Key="OperBoxCopyToClipboard">Copy to Clipboard</system:String>
     <!--  !Operator Recognition  -->
@@ -590,6 +602,12 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
     <system:String x:Key="LoopTimes">Loop Times</system:String>
     <system:String x:Key="Start">Start</system:String>
     <system:String x:Key="VideoLink">Video Link</system:String>
+    <system:String x:Key="CopilotSkill">Skill</system:String>
+    <system:String x:Key="TotalOperatorsCount">Total {0} Operator(s)</system:String>
+    <system:String x:Key="DirectiveECTerm">Directive EC unit:</system:String>
+    <system:String x:Key="OtherOperators">Other operators:</system:String>
+    <system:String x:Key="InitialEquipmentHorizontal">Tactical Equipment (horizontal):</system:String>
+    <system:String x:Key="InitialStrategy">Initial Strategy:</system:String>
     <!--  Logs  -->
     <system:String x:Key="CopilotTip">
         Tips: \n\n
@@ -706,7 +724,7 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
     <system:String x:Key="RoguelikeEvent">Event:</system:String>
     <system:String x:Key="FoldartalGainOcrNextLevel">FoldartalForesee:</system:String>
     <system:String x:Key="RoguelikeInvestment">Invested {1}(+{0}), deposit: {2}</system:String>
-    <system:String x:Key="RoguelikeSettlement">Roguelike Settlement: {0}\nExplore: {1} Floor {2} Step\nCombat: {3} / {4} Emergency / {5} BOSS\nRecruit: {6}\nCollectibles: {7}\nDifficulty: {8}\nScore: {9}\nExp: {10}, Skill: {11}</system:String>
+    <system:String x:Key="RoguelikeSettlement">Roguelike Settlement: {0}\nExplore: {1} Floor {2} Step\nCombat: {3} / {4} Emergency / {5} BOSS\nRecruit: {6}\nCollectibles: {7}\nDifficulty: {8}\nScore: {9}  Exp: {10}  Skill: {11}</system:String>
     <system:String x:Key="RoguelikeGainParadigm">Collapsal Paradigm Deepening: {0}</system:String>
     <system:String x:Key="RoguelikeDeepenParadigm">Collapsal Paradigm {0} Deepened to {1}</system:String>
     <system:String x:Key="RoguelikeLoseParadigm">Collapsal Paradigm Regression: {1}</system:String>
@@ -719,7 +737,7 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
     <system:String x:Key="ThisFacility" xml:space="preserve">Current Facility: </system:String>
     <system:String x:Key="RoomGroupsMatch" xml:space="preserve">Match Group: </system:String>
     <system:String x:Key="RoomGroupsMatchFailed" xml:space="preserve">Failed to match operator groups, group list: </system:String>
-    <system:String x:Key="RoomOperators" xml:space="preserve">preferred operators: </system:String>
+    <system:String x:Key="RoomOperators" xml:space="preserve">Preferred operators: </system:String>
     <system:String x:Key="ProductIncorrect">Product does NOT match the configuration.</system:String>
     <system:String x:Key="ProductUnknown">Unknown Product</system:String>
     <system:String x:Key="ProductChanged">Product has changed</system:String>
@@ -742,7 +760,7 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
     <system:String x:Key="UseFormation">Use formation</system:String>
     <system:String x:Key="Current">Current</system:String>
     <system:String x:Key="BattleFormation">Start formation</system:String>
-    <system:String x:Key="BattleFormationSelected" xml:space="preserve">Selection of operator: </system:String>
+    <system:String x:Key="BattleFormationSelected" xml:space="preserve">Operator selected: </system:String>
     <system:String x:Key="CurrentSteps">Current step: {0} {1}</system:String>
     <system:String x:Key="UnsupportedLevel">Unsupported stage, please check the level name or go to「Settings - Update - Check update」and try updating the resource version!</system:String>
     <system:String x:Key="ResourceUpdatePaused">Due to server resource constraints, resource version updates are temporarily suspended. Please manually import the level file or wait for a new version release</system:String>
@@ -796,7 +814,7 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
     <!--  VersionUpdatePopup  -->
     <system:String x:Key="UpdateNotificationOk">OK!</system:String>
     <system:String x:Key="VersionUpdated">Version Updated</system:String>
-    <system:String x:Key="VersionUpdatedTo" xml:space="preserve">Version: </system:String>
+    <system:String x:Key="VersionUpdatedTo" xml:space="preserve">Updated Version: </system:String>
     <!--  !VersionUpdatePopup  -->
     <!--  RootViewModel  -->
     <system:String x:Key="ConfirmExitTitle">MAA is running tasks</system:String>
@@ -846,19 +864,21 @@ The video aspect ratio needs to be 16:9 without interference factors such as bla
 
 The support for reclamation algorithm is still under development at present. Please mind the following:
 
-In normal mode, MAA: 
-  1. Cannot be used when a save already exists. (simply delete the current save)
-  2. Cannot be used when squads are not empty. (simply clear the current squad)
-  3. Can only be started at the main nav page of reclamation algorithm. 
+Farm points through initial setup: (Be careful that existing save files might be deleted)
+  1. After reaching the maximum points, it will output 'Task Completed' and automatically stop the task.
+  2. Cannot be used when squads are not empty (simply clear the current squad).
+  3. Manually check and delete save files to prevent MAA from deleting your valuable saves.
+  4. Navigation is not yet implemented, so the task cannot be started from locations outside the Reclamation mode.
+  5. If an error occurs during the task or the task completes without reaching the maximum points, please submit an issue on GitHub.
 
-To get points by manufacturing: 
-  1. it must be the first day after settlement, and there should be no enemy attacks entering the stationed area for the next three days. 
-  2. It must start when entering the reclamation algorithm. (stationed location needs to be visible)
-  3. If the quantity that can be manufactured is exactly a multiple of 99, MAA can be confused (stuck). You can use up a little before saving. This might be repaired later. 
+With save file: farm points through crafting (advanced).
+  1. It must be the first day after settlement, and there should be no enemy attacks entering the stationed area for the next three days.
+  2. It must start after entering the interface of the large map. (stationed location needs to be visible)
+  3. If the quantity that can be manufactured is exactly a multiple of 99, MAA can get confused (stuck). You can use up a little before saving. This might be repaired later.
     </system:String>
     <system:String x:Key="ReclamationBePatient">Chill and relax, please be patient</system:String>
-    <system:String x:Key="Reclamation2ExEnable">Earn points by manufacturing</system:String>
-    <system:String x:Key="Reclamation2ExProductTip">Support prop name</system:String>
-    <system:String x:Key="Reclamation2ExProductPlaceholder">Glow Stick</system:String>
+    <system:String x:Key="Reclamation2ExEnable">Farm points through crafting</system:String>
+    <system:String x:Key="ReclamationToolToCraftTip">Support prop name</system:String>
+    <system:String x:Key="ReclamationToolToCraftPlaceholder">Glow Stick</system:String>
     <!--  !Reclamation  -->
 </ResourceDictionary>

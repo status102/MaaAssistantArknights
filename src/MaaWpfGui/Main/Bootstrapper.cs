@@ -23,6 +23,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using GlobalHotKey;
+using MaaWpfGui.Configuration;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Services;
 using MaaWpfGui.Services.HotKeys;
@@ -226,6 +227,7 @@ namespace MaaWpfGui.Main
             ToastNotification.Cleanup();
 
             ConfigurationHelper.Release();
+            ConfigFactory.Release();
 
             _logger.Information("MaaAssistantArknights GUI exited");
             _logger.Information(string.Empty);
@@ -286,13 +288,32 @@ namespace MaaWpfGui.Main
         /// <inheritdoc/>
         protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
         {
+            LogUnhandledException(e.Exception);
+            ShowErrorDialog(e.Exception);
+            e.Handled = true;
+        }
+
+        private static void LogUnhandledException(Exception exception)
+        {
             if (_logger != Logger.None)
             {
-                _logger.Fatal(e.Exception, "Unhandled exception");
+                _logger.Fatal(exception, "Unhandled exception occurred");
             }
+        }
 
-            var errorView = new ErrorView(e.Exception, true);
-            errorView.ShowDialog();
+        private static void ShowErrorDialog(Exception exception)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                // DragDrop.DoDragSourceMove 会导致崩溃，但不需要退出程序
+                // 这是一坨屎，但是没办法，只能这样了
+                var isDragDropException = exception is COMException && exception.ToString()!.Contains("DragDrop.DoDragSourceMove");
+
+                var shouldExit = !isDragDropException;
+
+                var errorView = new ErrorView(exception, shouldExit);
+                errorView.ShowDialog();
+            });
         }
     }
 }

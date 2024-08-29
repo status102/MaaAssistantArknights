@@ -48,9 +48,15 @@
     <system:String x:Key="ExternalNotificationDiscordUserId">사용자 ID</system:String>
     <system:String x:Key="ExternalNotificationTelegramBotToken">봇 토큰</system:String>
     <system:String x:Key="ExternalNotificationTelegramChatId">채팅 ID</system:String>
+    <system:String x:Key="ExternalNotificationQmsgServer">섬기는 사람</system:String>
+    <system:String x:Key="ExternalNotificationQmsgKey">Qmsg Key</system:String>
+    <system:String x:Key="ExternalNotificationQmsgUser">사용자 QQ</system:String>
+    <system:String x:Key="ExternalNotificationQmsgBot">봇 보내기 QQ</system:String>
     <system:String x:Key="UseGpuForInference">추론 가속화를 위해 GPU 사용</system:String>
     <system:String x:Key="GpuOptionDisable">사용안함</system:String>
     <system:String x:Key="GpuOptionSystemDefault">시스템 기본 GPU</system:String>
+    <system:String x:Key="GpuDeprecatedMessage">추론 가속을 위해 현재 선택된 GPU({0})의 사용이 권장되지 않습니다\n\n「설정 - 성능 설정」에서 다른 GPU를 선택하거나 이 메시지를 비활성화할 수 있습니다</system:String>
+    <system:String x:Key="GpuAllowDeprecated">권장되지 않는 GPU 사용 허용</system:String>
     <!--  설정 가이드  -->
     <system:String x:Key="TaskSettings">작업 설정</system:String>
     <system:String x:Key="SettingsGuide">설정 가이드</system:String>
@@ -371,7 +377,7 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <system:String x:Key="ScreenshotTest">스크린샷 테스트</system:String>
     <system:String x:Key="MuMu12ExtrasEnabled">MuMu의 스크린샷 향상 모드를 활성화하세요</system:String>
     <system:String x:Key="MuMu12ExtrasEnabledTip">
-        MuMu 12 3.8.13 이상은 필요하며, MuMu 12 Arknights edition/Global 에서는 지원되지 않습니다.\n
+        MuMu 12 V4.0.0 이상은 필요하며, MuMu 12 Global 에서는 지원되지 않습니다.\n
         이 기능을 활성화한 후 처음으로 사용하기 전에 스크린샷 테스트를 수행하는 것이 좋습니다.\n\n
         다음 정보를 기입하세요: \n\n
         1. 에뮬레이터 경로: (예: C:\\Program Files\\Netease\\MuMuPlayer-12.0) \n
@@ -405,8 +411,15 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <system:String x:Key="Mall">크레딧 수급 및 상점</system:String>
     <system:String x:Key="Mission">보상 수령</system:String>
     <system:String x:Key="AutoRoguelike">통합전략</system:String>
-    <system:String x:Key="ReclamationAlgorithm">생존연산·모래 속의 불</system:String>
-    <system:String x:Key="ReclamationAlgorithm2">생존연산·사막 이야기</system:String>
+    <system:String x:Key="Reclamation">생존연산</system:String>
+    <system:String x:Key="ReclamationTheme">생존연산 테마</system:String>
+    <system:String x:Key="ReclamationThemeTales">사막 이야기</system:String>
+    <system:String x:Key="ReclamationModeProsperityNoSave">세이브 X, 스테이지 반복으로 번영의 선물 획득</system:String>
+    <system:String x:Key="ReclamationModeProsperityInSave">세이브 O, 도구 제작으로 번영의 선물 획득</system:String>
+    <system:String x:Key="OperNameLanguage">간부 이름 표시 언어</system:String>
+    <system:String x:Key="OperNameLanguageMAA">MAA 따라가기</system:String>
+    <system:String x:Key="OperNameLanguageClient">게임 클라이언트 따라가기</system:String>
+    <system:String x:Key="OperNameLanguageForce">지정된 언어를 강제로 사용</system:String>
     <system:String x:Key="Light">라이트</system:String>
     <system:String x:Key="Dark">다크</system:String>
     <system:String x:Key="SyncWithOs">시스템 연동</system:String>
@@ -421,7 +434,9 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <system:String x:Key="Hibernate">절전 모드</system:String>
     <system:String x:Key="Shutdown">시스템 종료</system:String>
     <system:String x:Key="Once">한 번만*</system:String>
-    <system:String x:Key="PostActionOnceTip">활성화된 경우, 다음 실행까지 변경 사항이 저장되지 않습니다.</system:String>
+    <system:String x:Key="PostActionOnceTip" xml:space="preserve">한 번만 실행하려면 먼저 Only once를 체크하세요.
+Only once가 체크되면 실행 후 Only once가 체크되기 전 상태로 작업이 복원됩니다.
+아래 작업을 마우스 오른쪽 버튼으로 클릭하면 선택한 Only once 상태가 동기적으로 활성화/취소됩니다.</system:String>
     <system:String x:Key="IfNoOtherMaa">다른 MAA가 없는 경우</system:String>
     <system:String x:Key="BackToAndroidHome">에뮬레이터가 홈 화면으로 돌아갑니다</system:String>
     <system:String x:Key="LinkStart">Link Start!</system:String>
@@ -522,7 +537,8 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <!--  오퍼레이터 인식  -->
     <system:String x:Key="OperBoxRecognition">오퍼레이터 인식</system:String>
     <system:String x:Key="OperBoxRecognitionTip">시작하기 전에 등록된 「선호」오퍼레이터를 등록 해제하세요.\n이 기능은 현재 테스트 중입니다. 만약 오류가 있다면 MAA 경로 내 debug 폴더 안의 oper 폴더 전체를 압축해서 Github의 issue로 올려주세요~</system:String>
-    <system:String x:Key="OperBoxRecognitionResult">미보유: {0}\n목록:\n\n{1}\n보유: {2}\n목록:\n\n{3}</system:String>
+    <system:String x:Key="OperBoxHaveList">보유: {0}</system:String>
+    <system:String x:Key="OperBoxNotHaveList">미보유: {0}</system:String>
     <system:String x:Key="StartToOperBoxRecognition">인식 시작</system:String>
     <system:String x:Key="OperBoxCopyToClipboard">클립보드에 복사</system:String>
     <!--  !오퍼레이터 인식  -->
@@ -589,6 +605,12 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <system:String x:Key="LoopTimes">반복 횟수</system:String>
     <system:String x:Key="Start">시작</system:String>
     <system:String x:Key="VideoLink">영상 링크</system:String>
+    <system:String x:Key="CopilotSkill">스킬</system:String>
+    <system:String x:Key="TotalOperatorsCount">총 {0}명의 오퍼레이터</system:String>
+    <system:String x:Key="DirectiveECTerm">에너지 기어:</system:String>
+    <system:String x:Key="OtherOperators">기타 오퍼레이터:</system:String>
+    <system:String x:Key="InitialEquipmentHorizontal">전술 장비 (가로):</system:String>
+    <system:String x:Key="InitialStrategy">초기 전략:</system:String>
     <!--  Logs  -->
     <system:String x:Key="CopilotTip">
         팁:\n\n
@@ -674,7 +696,7 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <system:String x:Key="UnableToAgent">프록시 명령을 사용할 수 없습니다</system:String>
     <system:String x:Key="MissionStart">행동 개시</system:String>
     <system:String x:Key="UnitTime">회</system:String>
-    <system:String x:Key="CurrentSanity" xml:space="preserve">이성: {0}/{1}</system:String>
+    <system:String x:Key="CurrentSanity" xml:space="preserve">이성: {0}/{1}  </system:String>
     <system:String x:Key="MedicineUsedTimes" xml:space="preserve">\n이성 회복제: {0}  </system:String>
     <system:String x:Key="MedicineUsedTimesWithExpiring" xml:space="preserve">\n이성 회복제: {0},{1}(만료 예정)  </system:String>
     <system:String x:Key="StoneUsedTimes" xml:space="preserve">\n순오리지늄: {0}  </system:String>
@@ -842,22 +864,22 @@ OF-1을 해금하지 않았다면 선택하지 말아 주세요.</system:String>
     <!--  !Announcement  -->
     <!--  Reclamation  -->
     <system:String x:Key="ReclamationEarlyTip" xml:space="preserve">고급 설정에서 모드를 전환할 수 있습니다.
-    
-현재 생존연산 기능은 초기 단계이며, 다음 사항을 주의하세요:   
 
- 일반 모드에서:
- 1. 기존 데이터(진행사항)가 있는 경우 사용할 수 없습니다
- 2. 생존연산 편성 창에 오퍼레이터가 있는 경우 사용할 수 없습니다
- 3. 생존연산 메인 화면에서 작업을 시작해야 합니다
+현재 생존연산 기능은 초기 단계이며, 다음 사항을 주의하세요:
 
- 제작 점수 획득 모드에서:
+생존연산 메인 화면에서 작업을 시작해야 합니다
+
+ 세이브 O: 스테이지 반복으로 번영의 선물 획득
+  1. 기존 데이터가 있는 경우 사용할 수 없습니다 (현재 데이터를 지우세요)
+  2. 편성창이 비워있지 않으면 사용할 수 없습니다 (편성창을 비우세요)
+
+ 세이브 X: 도구 제작으로 번영의 선물 획득
   1. 결산 후 첫 번째 날이어야 하며, 이후 3일 이내에 적의 침입이 없어야 합니다
-  2. 생존연산에 진입해서 기지를 볼 수 있는 화면에서 시작해야 합니다
-  3. 제조 가능한 수량이 99의 배수일 경우 멈출 수 있습니다. 저장하기 전에 재료를 약간 사용한 후에 다시 시도하세요
+  2. 제조 가능한 수량이 99의 배수일 경우 멈출 수 있습니다. 저장하기 전에 재료를 약간 사용한 후에 다시 시도하세요
     </system:String>
     <system:String x:Key="ReclamationBePatient">빨리 발전하고 싶어요! 또 급해져버렸네요</system:String>
     <system:String x:Key="Reclamation2ExEnable">제작 점수 획득 모드</system:String>
-    <system:String x:Key="Reclamation2ExProductTip">제작할 도구 이름</system:String>
-    <system:String x:Key="Reclamation2ExProductPlaceholder">형광봉 (荧光棒)</system:String>
+    <system:String x:Key="ReclamationToolToCraftTip">제작할 도구 이름</system:String>
+    <system:String x:Key="ReclamationToolToCraftPlaceholder">형광봉 (荧光棒)</system:String>
     <!--  !Reclamation  -->
 </ResourceDictionary>

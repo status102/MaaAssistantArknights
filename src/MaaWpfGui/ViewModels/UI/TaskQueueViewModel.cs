@@ -125,7 +125,8 @@ namespace MaaWpfGui.ViewModels.UI
             }
             else if (actions.ExitArknights)
             {
-                if (!Instances.AsstProxy.AsstStartCloseDown())
+                var mode = Instances.SettingsViewModel.ClientType;
+                if (!Instances.AsstProxy.AsstStartCloseDown(mode))
                 {
                     AddLog(LocalizationHelper.GetString("CloseArknightsFailed"), UiLogColor.Error);
                 }
@@ -197,12 +198,16 @@ namespace MaaWpfGui.ViewModels.UI
                 // 休眠提示
                 AddLog(LocalizationHelper.GetString("HibernatePrompt"), UiLogColor.Error);
 
+                /*
                 // 休眠不能加时间参数，https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/1133
                 Process.Start("shutdown.exe", "-h");
+                */
+                PowerManagement.Hibernate();
             }
 
-            void DoShutDown()
+            async void DoShutDown()
             {
+                /*
                 Process.Start("shutdown.exe", "-s -t 60");
 
                 // 关机询问
@@ -211,6 +216,17 @@ namespace MaaWpfGui.ViewModels.UI
                 {
                     Process.Start("shutdown.exe", "-a");
                 }
+                */
+                if (await TimerCanceledAsync(
+                        LocalizationHelper.GetString("Shutdown"),
+                        LocalizationHelper.GetString("AboutToShutdown"),
+                        LocalizationHelper.GetString("Cancel"),
+                        60))
+                {
+                    return;
+                }
+
+                PowerManagement.Shutdown();
             }
         }
 
@@ -323,47 +339,76 @@ namespace MaaWpfGui.ViewModels.UI
             DateTime currentTime = DateTime.Now;
             currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, 0);
 
-            if (NeedToUpdateDatePrompt())
-            {
-                UpdateDatePrompt();
-                UpdateStageList(false);
-
-                // 随机延迟，防止同时更新
-                var delayTime = new Random().Next(0, 60 * 60 * 1000);
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(delayTime);
-                    await _runningState.UntilIdleAsync(60000);
-                    await _stageManager.UpdateStageWeb();
-                    UpdateDatePrompt();
-                    UpdateStageList(false);
-                });
-            }
-
-            if (NeedToCheckForUpdates())
-            {
-                if (Instances.SettingsViewModel.UpdateAutoCheck)
-                {
-                    // 随机延迟，防止同时更新
-                    var delayTime = new Random().Next(0, 60 * 60 * 1000);
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(delayTime);
-                        _ = Instances.SettingsViewModel.ManualUpdate();
-                    });
-                }
-            }
+            HandleDatePromptUpdate();
+            HandleCheckForUpdates();
 
             RefreshCustomInfrastPlanIndexByPeriod();
 
-            if (!_runningState.GetIdle() && !Instances.SettingsViewModel.ForceScheduledStart && !Instances.SettingsViewModel.CustomConfig)
+            await HandleTimerLogic(currentTime);
+        }
+
+        private static int CalculateRandomDelay()
+        {
+            Random random = new Random();
+            int delayTime = random.Next(0, 60 * 60 * 1000);
+            return delayTime;
+        }
+
+        private bool _isUpdatingDatePrompt;
+
+        private void HandleDatePromptUpdate()
+        {
+            if (!NeedToUpdateDatePrompt() || _isUpdatingDatePrompt)
             {
                 return;
             }
 
-            var timeToStart = false;
-            var timeToChangeConfig = false;
-            var configIndex = 0;
+            _isUpdatingDatePrompt = true;
+            UpdateDatePrompt();
+            UpdateStageList(false);
+
+            var delayTime = CalculateRandomDelay();
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(delayTime);
+                await _runningState.UntilIdleAsync(60000);
+                await _stageManager.UpdateStageWeb();
+                UpdateDatePrompt();
+                UpdateStageList(false);
+                _isUpdatingDatePrompt = false;
+            });
+        }
+
+        private bool _isCheckingForUpdates;
+
+        private void HandleCheckForUpdates()
+        {
+            if (!NeedToCheckForUpdates() || _isCheckingForUpdates)
+            {
+                return;
+            }
+
+            if (!Instances.SettingsViewModel.UpdateAutoCheck)
+            {
+                return;
+            }
+
+            _isCheckingForUpdates = true;
+            var delayTime = CalculateRandomDelay();
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(delayTime);
+                await Instances.SettingsViewModel.ManualUpdate();
+                _isCheckingForUpdates = false;
+            });
+        }
+
+        private static (bool timeToStart, bool timeToChangeConfig, int configIndex) CheckTimers(DateTime currentTime)
+        {
+            bool timeToStart = false;
+            bool timeToChangeConfig = false;
+            int configIndex = 0;
+
             for (int i = 0; i < 8; ++i)
             {
                 if (!Instances.SettingsViewModel.TimerModels.Timers[i].IsOn)
@@ -402,28 +447,46 @@ namespace MaaWpfGui.ViewModels.UI
                 }
             }
 
-            if (timeToChangeConfig)
-            {
-                if (Instances.SettingsViewModel.CustomConfig &&
-                    (_runningState.GetIdle() || Instances.SettingsViewModel.ForceScheduledStart))
-                {
-                    // CurrentConfiguration设置后会重启
-                    Instances.SettingsViewModel.CurrentConfiguration = Instances.SettingsViewModel.TimerModels.Timers[configIndex].TimerConfig;
-                    return;
-                }
-            }
-
-            if (!timeToStart)
+            return (timeToStart, timeToChangeConfig, configIndex);
+        }
+        private async Task HandleTimerLogic(DateTime currentTime)
+        {
+            if (!_runningState.GetIdle() && !Instances.SettingsViewModel.ForceScheduledStart)
             {
                 return;
             }
 
+            var (timeToStart, timeToChangeConfig, configIndex) = CheckTimers(currentTime);
+
+            if (timeToChangeConfig)
+            {
+                HandleConfigChange(configIndex);
+                return;
+            }
+
+            if (timeToStart)
+            {
+                await HandleScheduledStart(configIndex);
+            }
+        }
+
+        private void HandleConfigChange(int configIndex)
+        {
+            if (Instances.SettingsViewModel.CustomConfig &&
+                (_runningState.GetIdle() || Instances.SettingsViewModel.ForceScheduledStart))
+            {
+                Instances.SettingsViewModel.CurrentConfiguration = Instances.SettingsViewModel.TimerModels.Timers[configIndex].TimerConfig;
+            }
+        }
+
+        private async Task HandleScheduledStart(int configIndex)
+        {
             if (Instances.SettingsViewModel.ForceScheduledStart)
             {
-                // 什么时候会遇到这种情况？
                 if (Instances.SettingsViewModel.CustomConfig &&
                     Instances.SettingsViewModel.CurrentConfiguration != Instances.SettingsViewModel.TimerModels.Timers[configIndex].TimerConfig)
                 {
+                    _logger.Warning($"Scheduled start skipped: Custom configuration is enabled, but the current configuration does not match the scheduled timer configuration (Timer Index: {configIndex}). Current Configuration: {Instances.SettingsViewModel.CurrentConfiguration}, Scheduled Configuration: {Instances.SettingsViewModel.TimerModels.Timers[configIndex].TimerConfig}");
                     return;
                 }
 
@@ -432,7 +495,11 @@ namespace MaaWpfGui.ViewModels.UI
                     Instances.MainWindowManager?.Show();
                 }
 
-                if (await TimerCanceledAsync())
+                if (await TimerCanceledAsync(
+                        LocalizationHelper.GetString("ForceScheduledStart"),
+                        LocalizationHelper.GetString("ForceScheduledStartTip"),
+                        LocalizationHelper.GetString("Cancel"),
+                        10))
                 {
                     return;
                 }
@@ -442,7 +509,8 @@ namespace MaaWpfGui.ViewModels.UI
                     await Stop();
                 }
 
-                if (!Instances.AsstProxy.AsstAppendCloseDown())
+                var mode = Instances.SettingsViewModel.ClientType;
+                if (!Instances.AsstProxy.AsstAppendCloseDown(mode))
                 {
                     AddLog(LocalizationHelper.GetString("CloseArknightsFailed"), UiLogColor.Error);
                 }
@@ -455,13 +523,13 @@ namespace MaaWpfGui.ViewModels.UI
             LinkStart();
         }
 
-        private static async Task<bool> TimerCanceledAsync()
+        private static async Task<bool> TimerCanceledAsync(string content = "", string tipContent = "", string buttonContent="", int seconds = 10)
         {
-            var delay = TimeSpan.FromSeconds(10);
+            var delay = TimeSpan.FromSeconds(seconds);
             var dialogUserControl = new Views.UserControl.TextDialogWithTimerUserControl(
-                LocalizationHelper.GetString("ForceScheduledStart"),
-                LocalizationHelper.GetString("ForceScheduledStartTip"),
-                LocalizationHelper.GetString("Cancel"),
+                content,
+                tipContent,
+                buttonContent,
                 delay.TotalMilliseconds);
             var dialog = HandyControl.Controls.Dialog.Show(dialogUserControl, nameof(Views.UI.RootView));
             var canceled = false;
@@ -493,7 +561,7 @@ namespace MaaWpfGui.ViewModels.UI
 
             if (!(Instances.SettingsViewModel.ClientType is "txwy"))
             {
-                taskList.Add("ReclamationAlgorithm2");
+                taskList.Add("Reclamation");
             }
 
             {
@@ -740,7 +808,6 @@ namespace MaaWpfGui.ViewModels.UI
                 {
                     case SpecificConfig.TaskTypeEnum.Roguelike:
                     case SpecificConfig.TaskTypeEnum.Reclamation:
-                    case "ReclamationAlgorithm2":
                         continue;
                 }
 
@@ -842,8 +909,7 @@ namespace MaaWpfGui.ViewModels.UI
                     switch (item.OriginalName)
                     {
                         case "AutoRoguelike":
-                        case "ReclamationAlgorithm":
-                        case "ReclamationAlgorithm2":
+                        case "Reclamation":
                             item.IsChecked = false;
                             continue;
                     }
@@ -1054,12 +1120,8 @@ namespace MaaWpfGui.ViewModels.UI
                         taskRet &= AppendRoguelike();
                         break;
 
-                    case "ReclamationAlgorithm":
+                    case "Reclamation":
                         taskRet &= AppendReclamation();
-                        break;
-
-                    case "ReclamationAlgorithm2":
-                        taskRet &= AppendReclamation2();
                         break;
 
                     default:
@@ -1553,14 +1615,12 @@ namespace MaaWpfGui.ViewModels.UI
 
         private static bool AppendReclamation()
         {
-            return Instances.AsstProxy.AsstAppendReclamation();
-        }
+            _ = int.TryParse(Instances.SettingsViewModel.ReclamationMode, out var mode);
 
-        private static bool AppendReclamation2()
-        {
-            return Instances.AsstProxy.AsstAppendReclamation2(
-                Instances.SettingsViewModel.Reclamation2ExEnable ? 1 : 0,
-                Instances.SettingsViewModel.Reclamation2ExProduct);
+            return Instances.AsstProxy.AsstAppendReclamation(
+                Instances.SettingsViewModel.ReclamationTheme,
+                mode,
+                Instances.SettingsViewModel.ReclamationToolToCraft);
         }
 
         [DllImport("User32.dll", EntryPoint = "FindWindow")]

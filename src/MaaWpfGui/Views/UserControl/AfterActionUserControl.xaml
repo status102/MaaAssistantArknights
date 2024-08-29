@@ -20,8 +20,13 @@
     mc:Ignorable="d">
     <StackPanel>
         <StackPanel Visibility="{c:Binding !TaskSettingVisibilities.EnableAdvancedSettings}">
-            <CheckBox Margin="0,10" IsChecked="{Binding PostActionSetting.Once}">
-                <controls:TextBlock Text="{DynamicResource Once}" ToolTip="{DynamicResource PostActionOnceTip}" />
+            <CheckBox
+                Margin="0,10"
+                HorizontalAlignment="Left"
+                IsChecked="{Binding PostActionSetting.Once}"
+                ToolTip="{DynamicResource PostActionOnceTip}"
+                ToolTipService.InitialShowDelay="0">
+                <controls:TextBlock Text="{DynamicResource Once}" TextWrapping="Wrap" />
             </CheckBox>
             <hc:Divider />
             <CheckBox
@@ -78,6 +83,13 @@
                 MouseRightButtonUp="{s:Action PostActionsAndOnce}">
                 <controls:TextBlock Text="{DynamicResource Shutdown}" TextWrapping="Wrap" />
             </CheckBox>
+
+            <Button
+                Height="30"
+                Margin="20,10,20,0"
+                s:View.ActionTarget="{Binding PostActionSetting}"
+                Command="{s:Action PostActionsClear}"
+                Content="{DynamicResource Clear}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

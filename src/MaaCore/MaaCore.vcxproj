@@ -89,6 +89,7 @@
     <ClInclude Include="Task\Reclamation\ReclamationConclusionReportPlugin.h" />
     <ClInclude Include="Task\Reclamation\ReclamationBattlePlugin.h" />
     <ClInclude Include="Task\Interface\ReclamationTask.h" />
+    <ClInclude Include="Task\Reclamation\ReclamationConfig.h" />
     <ClInclude Include="Task\BattleHelper.h" />
     <ClInclude Include="Task\Interface\SingleStepTask.h" />
     <ClInclude Include="Task\Interface\SSSCopilotTask.h" />
@@ -103,6 +104,8 @@
     <ClInclude Include="Task\Roguelike\Sami\RoguelikeFoldartalStartTaskPlugin.h" />
     <ClInclude Include="Task\Roguelike\Sami\RoguelikeFoldartalUseTaskPlugin.h" />
     <ClInclude Include="Task\Roguelike\Sami\RoguelikeCollapsalParadigmTaskPlugin.h" />
+    <ClInclude Include="Task\Roguelike\Map\RoguelikeMap.h" />
+    <ClInclude Include="Task\Roguelike\Map\RoguelikeRoutingTaskPlugin.h" />
     <ClInclude Include="Task\SSS\SSSBattleProcessTask.h" />
     <ClInclude Include="Task\SSS\SSSDropRewardsTaskPlugin.h" />
     <ClInclude Include="Task\SSS\SSSStageManagerTask.h" />
@@ -130,6 +133,7 @@
     <ClInclude Include="Vision\Miscellaneous\RecruitImageAnalyzer.h" />
     <ClInclude Include="Vision\Miscellaneous\StageDropsImageAnalyzer.h" />
     <ClInclude Include="Vision\Miscellaneous\OperBoxImageAnalyzer.h" />
+    <ClInclude Include="Vision\Miscellaneous\BrightPointAnalyzer.h" />
     <ClInclude Include="Vision\MultiMatcher.h" />
     <ClInclude Include="Vision\OCRer.h" />
     <ClInclude Include="Vision\TemplDetOCRer.h" />
@@ -153,6 +157,7 @@
     <ClInclude Include="Config\Miscellaneous\TilePack.h" />
     <ClInclude Include="Config\ResourceLoader.h" />
     <ClInclude Include="Config\Roguelike\RoguelikeCopilotConfig.h" />
+    <ClInclude Include="Config\Roguelike\RoguelikeMapConfig.h" />
     <ClInclude Include="Config\Roguelike\RoguelikeRecruitConfig.h" />
     <ClInclude Include="Config\Roguelike\RoguelikeShoppingConfig.h" />
     <ClInclude Include="Config\Roguelike\RoguelikeStageEncounterConfig.h" />
@@ -273,6 +278,7 @@
     <ClCompile Include="Task\Reclamation\ReclamationConclusionReportPlugin.cpp" />
     <ClCompile Include="Task\Reclamation\ReclamationBattlePlugin.cpp" />
     <ClCompile Include="Task\Interface\ReclamationTask.cpp" />
+    <ClCompile Include="Task\Reclamation\ReclamationConfig.cpp" />
     <ClCompile Include="Task\BattleHelper.cpp" />
     <ClCompile Include="Task\Interface\SingleStepTask.cpp" />
     <ClCompile Include="Task\Interface\SSSCopilotTask.cpp" />
@@ -281,6 +287,8 @@
     <ClCompile Include="Task\Roguelike\Sami\RoguelikeFoldartalStartTaskPlugin.cpp" />
     <ClCompile Include="Task\Roguelike\Sami\RoguelikeFoldartalUseTaskPlugin.cpp" />
     <ClCompile Include="Task\Roguelike\Sami\RoguelikeCollapsalParadigmTaskPlugin.cpp" />
+    <ClCompile Include="Task\Roguelike\Map\RoguelikeMap.cpp" />
+    <ClCompile Include="Task\Roguelike\Map\RoguelikeRoutingTaskPlugin.cpp" />
     <ClCompile Include="Task\Roguelike\RoguelikeConfig.cpp" />
     <ClCompile Include="Task\Roguelike\RoguelikeDifficultySelectionTaskPlugin.cpp" />
     <ClCompile Include="Task\Roguelike\RoguelikeInvestTaskPlugin.cpp" />
@@ -311,6 +319,7 @@
     <ClCompile Include="Vision\Miscellaneous\RecruitImageAnalyzer.cpp" />
     <ClCompile Include="Vision\Miscellaneous\StageDropsImageAnalyzer.cpp" />
     <ClCompile Include="Vision\Miscellaneous\OperBoxImageAnalyzer.cpp" />
+    <ClCompile Include="Vision\Miscellaneous\BrightPointAnalyzer.cpp" />
     <ClCompile Include="Vision\MultiMatcher.cpp" />
     <ClCompile Include="Vision\OCRer.cpp" />
     <ClCompile Include="Vision\TemplDetOCRer.cpp" />
@@ -332,6 +341,7 @@
     <ClCompile Include="Config\Miscellaneous\TilePack.cpp" />
     <ClCompile Include="Config\ResourceLoader.cpp" />
     <ClCompile Include="Config\Roguelike\RoguelikeCopilotConfig.cpp" />
+    <ClCompile Include="Config\Roguelike\RoguelikeMapConfig.cpp" />
     <ClCompile Include="Config\Roguelike\RoguelikeRecruitConfig.cpp" />
     <ClCompile Include="Config\Roguelike\RoguelikeShoppingConfig.cpp" />
     <ClCompile Include="Config\Roguelike\RoguelikeStageEncounterConfig.cpp" />
