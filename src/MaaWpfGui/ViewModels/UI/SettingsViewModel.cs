@@ -828,9 +828,17 @@ namespace MaaWpfGui.ViewModels.UI
             {
                 _receiveAward = awardTask.Award;
                 _receiveMail = awardTask.Mail;
+                _receiveFreeRecruit = awardTask.FreeRecruit;
+                _receiveOrundum = awardTask.Orundum;
+                _receiveMining = awardTask.Mining;
+                _receiveReceiveSpecialAccess = awardTask.SpecialAccess;
 
                 NotifyOfPropertyChange(nameof(ReceiveAward));
                 NotifyOfPropertyChange(nameof(ReceiveMail));
+                NotifyOfPropertyChange(nameof(ReceiveFreeRecruit));
+                NotifyOfPropertyChange(nameof(ReceiveOrundum));
+                NotifyOfPropertyChange(nameof(ReceiveMining));
+                NotifyOfPropertyChange(nameof(ReceiveSpecialAccess));
             }
             else if (task is MallTask mallTask)
             {
@@ -3034,9 +3042,8 @@ namespace MaaWpfGui.ViewModels.UI
         #endregion
 
         #region 领取奖励设置
-        private bool _receiveAward;
 
-        private bool _receiveAward = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ReceiveAward, bool.TrueString));
+        private bool _receiveAward;
 
         /// <summary>
         /// Gets or sets a value indicating whether receive award is enabled.
@@ -3047,9 +3054,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _receiveAward, value);
-                if (ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex] is AwardTask task)
-                {
-                    task.Award = value;
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Award = value;
                 }
             }
         }
@@ -3065,14 +3070,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _receiveMail, value);
-                if (ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex] is AwardTask task)
-                {
-                    task.Mail = value;
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Mail = value;
                 }
             }
-        }
 
-        private bool _receiveFreeRecruit = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ReceiveFreeRecruit, bool.FalseString));
+        private bool _receiveFreeRecruit;
 
         /// <summary>
         /// Gets or sets a value indicating whether receive mail is enabled.
@@ -3099,11 +3101,11 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 SetAndNotify(ref _receiveFreeRecruit, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.ReceiveFreeRecruit, value.ToString());
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).FreeRecruit = value;
             }
         }
 
-        private bool _receiveOrundum = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ReceiveOrundum, bool.FalseString));
+        private bool _receiveOrundum;
 
         /// <summary>
         /// Gets or sets a value indicating whether receive orundum is enabled.
@@ -3114,11 +3116,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _receiveOrundum, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.ReceiveOrundum, value.ToString());
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Orundum = value;
             }
         }
 
-        private bool _receiveMining = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ReceiveMining, bool.FalseString));
+        private bool _receiveMining;
 
         /// <summary>
         /// Gets or sets a value indicating whether receive mining is enabled.
@@ -3129,11 +3131,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _receiveMining, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.ReceiveMining, value.ToString());
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Mining = value;
             }
         }
 
-        private bool _receiveReceiveSpecialAccess = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ReceiveSpecialAccess, bool.FalseString));
+        private bool _receiveReceiveSpecialAccess;
 
         /// <summary>
         /// Gets or sets a value indicating whether to collect special access rewards.
@@ -3144,7 +3146,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _receiveReceiveSpecialAccess, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.ReceiveSpecialAccess, value.ToString());
+                ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).SpecialAccess = value;
             }
         }
 
