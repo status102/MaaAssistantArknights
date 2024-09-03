@@ -3057,7 +3057,6 @@ namespace MaaWpfGui.ViewModels.UI
                 ((AwardTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Award = value;
                 }
             }
-        }
 
         private bool _receiveMail;
 
