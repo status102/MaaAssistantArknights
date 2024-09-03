@@ -2054,7 +2054,6 @@ namespace MaaWpfGui.ViewModels.UI
         #endregion
 
         #region 肉鸽设置
-        private string _roguelikeTheme = ;
 
         private void UpdateRoguelikeModeList()
         {
