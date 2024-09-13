@@ -4005,7 +4005,7 @@ namespace MaaWpfGui.ViewModels.UI
                 new() { Display = LocalizationHelper.GetString("Txwy"), Value = "txwy" },
             ];
 
-        private bool _autoDetectConnection = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoDetect, bool.TrueString));
+        private bool _autoDetectConnection = ConfigFactory.CurrentConfig.Connection.AutoDetect;
 
         public bool AutoDetectConnection
         {
@@ -4017,7 +4017,7 @@ namespace MaaWpfGui.ViewModels.UI
                     return;
                 }
 
-                ConfigurationHelper.SetValue(ConfigurationKeys.AutoDetect, value.ToString());
+                ConfigFactory.CurrentConfig.Connection.AutoDetect = value;
 
                 if (value)
                 {
@@ -4026,16 +4026,10 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _alwaysAutoDetectConnection = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AlwaysAutoDetect, bool.FalseString));
-
         public bool AlwaysAutoDetectConnection
         {
-            get => _alwaysAutoDetectConnection;
-            set
-            {
-                SetAndNotify(ref _alwaysAutoDetectConnection, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AlwaysAutoDetect, value.ToString());
-            }
+            get => ConfigFactory.CurrentConfig.Connection.AlwaysAutoDetect;
+            set => ConfigFactory.CurrentConfig.Connection.AlwaysAutoDetect = value;
         }
 
         private ObservableCollection<string> _connectAddressHistory = [];
@@ -4046,7 +4040,7 @@ namespace MaaWpfGui.ViewModels.UI
             set => SetAndNotify(ref _connectAddressHistory, value);
         }
 
-        private string _connectAddress = ConfigurationHelper.GetValue(ConfigurationKeys.ConnectAddress, string.Empty);
+        private string _connectAddress = ConfigFactory.CurrentConfig.Connection.AdbAddress;
 
         /// <summary>
         /// Gets or sets the connection address.
@@ -4067,7 +4061,7 @@ namespace MaaWpfGui.ViewModels.UI
 
                 SetAndNotify(ref _connectAddress, value);
                 ConfigurationHelper.SetValue(ConfigurationKeys.AddressHistory, JsonConvert.SerializeObject(ConnectAddressHistory));
-                ConfigurationHelper.SetValue(ConfigurationKeys.ConnectAddress, value);
+                ConfigFactory.CurrentConfig.Connection.AdbAddress = value;
                 UpdateWindowTitle(); // 每次修改客户端时更新WindowTitle
             }
         }
@@ -4100,14 +4094,12 @@ namespace MaaWpfGui.ViewModels.UI
             ConfigurationHelper.SetValue(ConfigurationKeys.AddressHistory, JsonConvert.SerializeObject(ConnectAddressHistory));
         }
 
-        private string _adbPath = ConfigurationHelper.GetValue(ConfigurationKeys.AdbPath, string.Empty);
-
         /// <summary>
         /// Gets or sets the ADB path.
         /// </summary>
         public string AdbPath
         {
-            get => _adbPath;
+            get => ConfigFactory.CurrentConfig.Connection.AdbPath;
             set
             {
                 if (!Path.GetFileName(value).ToLower().Contains("adb"))
@@ -4130,9 +4122,7 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 Instances.AsstProxy.Connected = false;
-
-                SetAndNotify(ref _adbPath, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AdbPath, value);
+                ConfigFactory.CurrentConfig.Connection.AdbPath = value;
             }
         }
 
@@ -4433,14 +4423,12 @@ namespace MaaWpfGui.ViewModels.UI
 
         public LdPlayerConnectionExtras LdPlayerExtras { get; set; } = new();
 
-        private bool _retryOnDisconnected = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RetryOnAdbDisconnected, bool.FalseString));
-
         /// <summary>
         /// Gets or sets a value indicating whether to retry task after ADB disconnected.
         /// </summary>
         public bool RetryOnDisconnected
         {
-            get => _retryOnDisconnected;
+            get => ConfigFactory.CurrentConfig.Connection.RetryOnAdbDisconnected;
             set
             {
                 if (string.IsNullOrEmpty(EmulatorPath))
@@ -4453,39 +4441,26 @@ namespace MaaWpfGui.ViewModels.UI
                     value = false;
                 }
 
-                SetAndNotify(ref _retryOnDisconnected, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RetryOnAdbDisconnected, value.ToString());
+                ConfigFactory.CurrentConfig.Connection.RetryOnAdbDisconnected = value;
             }
         }
-
-        private bool _allowAdbRestart = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AllowAdbRestart, bool.TrueString));
 
         /// <summary>
         /// Gets or sets a value indicating whether to retry task after ADB disconnected.
         /// </summary>
         public bool AllowAdbRestart
         {
-            get => _allowAdbRestart;
-            set
-            {
-                SetAndNotify(ref _allowAdbRestart, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AllowAdbRestart, value.ToString());
-            }
+            get => ConfigFactory.CurrentConfig.Connection.AllAdbRestart;
+            set => ConfigFactory.CurrentConfig.Connection.AllAdbRestart = value;
         }
-
-        private bool _allowAdbHardRestart = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AllowAdbHardRestart, bool.TrueString));
 
         /// <summary>
         /// Gets or sets a value indicating whether to allow for killing ADB process.
         /// </summary>
         public bool AllowAdbHardRestart
         {
-            get => _allowAdbHardRestart;
-            set
-            {
-                SetAndNotify(ref _allowAdbHardRestart, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AllowAdbHardRestart, value.ToString());
-            }
+            get => ConfigFactory.CurrentConfig.Connection.AllAdbHardRestart;
+            set => ConfigFactory.CurrentConfig.Connection.AllAdbHardRestart = value;
         }
 
         private bool _deploymentWithPause = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RoguelikeDeploymentWithPause, bool.FalseString));
@@ -4501,28 +4476,22 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        private bool _adbLiteEnabled = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AdbLiteEnabled, bool.FalseString));
-
         public bool AdbLiteEnabled
         {
-            get => _adbLiteEnabled;
+            get => ConfigFactory.CurrentConfig.Connection.AdbLiteEnable;
             set
             {
-                SetAndNotify(ref _adbLiteEnabled, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AdbLiteEnabled, value.ToString());
+                ConfigFactory.CurrentConfig.Connection.AdbLiteEnable = value;
                 UpdateInstanceSettings();
             }
         }
 
-        private bool _killAdbOnExit = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.KillAdbOnExit, bool.FalseString));
-
         public bool KillAdbOnExit
         {
-            get => _killAdbOnExit;
+            get => ConfigFactory.CurrentConfig.Connection.KillAdbWhenExit;
             set
             {
-                SetAndNotify(ref _killAdbOnExit, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.KillAdbOnExit, value.ToString());
+                ConfigFactory.CurrentConfig.Connection.KillAdbWhenExit = value;
                 UpdateInstanceSettings();
             }
         }
@@ -4843,8 +4812,8 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _touchMode, value);
-                UpdateInstanceSettings();
                 ConfigurationHelper.SetValue(ConfigurationKeys.TouchMode, value);
+                UpdateInstanceSettings();
                 AskRestartToApplySettings();
             }
         }
@@ -4978,7 +4947,7 @@ namespace MaaWpfGui.ViewModels.UI
             }
         }
 
-        public bool AdbReplaced { get; set; } = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AdbReplaced, bool.FalseString));
+        public bool AdbReplaced { get; set; }// = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AdbReplaced, bool.FalseString));
 
         #endregion
 
