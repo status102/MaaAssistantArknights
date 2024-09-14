@@ -39,10 +39,6 @@ namespace MaaWpfGui.Models
         {
         }
 
-        public class RecruitTask : BaseTask
-        {
-        }
-
         public class RoguelikeTask : BaseTask
         {
             public string Theme { get; set; } = "Sami";

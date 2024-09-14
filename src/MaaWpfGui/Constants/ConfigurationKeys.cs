@@ -146,17 +146,17 @@ namespace MaaWpfGui.Constants
         public const string ReclamationIncrementMode = "Reclamation.ReclamationIncrementMode";
         public const string ReclamationMaxCraftCountPerRound = "Reclamation.ReclamationMaxCraftCountPerRound";
 
-        public const string RecruitMaxTimes = "AutoRecruit.MaxTimes";
-        public const string AutoRecruitFirstList = "AutoRecruit.AutoRecruitFirstList";
-        public const string RefreshLevel3 = "AutoRecruit.RefreshLevel3";
-        public const string ForceRefresh = "AutoRecruit.ForceRefresh";
+        public const string RecruitMaxTimes = "AutoRecruit.MaxTimes"; // 迁移
+        public const string AutoRecruitFirstList = "AutoRecruit.AutoRecruitFirstList"; // 迁移
+        public const string RefreshLevel3 = "AutoRecruit.RefreshLevel3"; // 迁移
+        public const string ForceRefresh = "AutoRecruit.ForceRefresh"; // 迁移
         public const string SelectExtraTags = "AutoRecruit.SelectExtraTags";
-        public const string IsLevel3UseShortTime = "AutoRecruit.IsLevel3UseShortTime";
-        public const string IsLevel3UseShortTime2 = "AutoRecruit.IsLevel3UseShortTime2";
-        public const string NotChooseLevel1 = "AutoRecruit.NotChooseLevel1";
-        public const string RecruitChooseLevel3 = "AutoRecruit.ChooseLevel3";
-        public const string RecruitChooseLevel4 = "AutoRecruit.ChooseLevel4";
-        public const string RecruitChooseLevel5 = "AutoRecruit.ChooseLevel5";
+        public const string IsLevel3UseShortTime = "AutoRecruit.IsLevel3UseShortTime"; // 迁移
+        public const string IsLevel3UseShortTime2 = "AutoRecruit.IsLevel3UseShortTime2"; // 迁移
+        public const string NotChooseLevel1 = "AutoRecruit.NotChooseLevel1"; // 迁移
+        public const string RecruitChooseLevel3 = "AutoRecruit.ChooseLevel3"; // 迁移
+        public const string RecruitChooseLevel4 = "AutoRecruit.ChooseLevel4"; // 迁移
+        public const string RecruitChooseLevel5 = "AutoRecruit.ChooseLevel5"; // 迁移
 
         public const string LastCreditFightTaskTime = "Visit.LastCreditFightTaskTime"; // 迁移
         public const string CreditFightTaskEnabled = "Visit.CreditFightTaskEnabled"; // 迁移

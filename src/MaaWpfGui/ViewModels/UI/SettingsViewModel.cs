@@ -849,11 +849,20 @@ namespace MaaWpfGui.ViewModels.UI
                 SetAndNotify(ref _creditVisitOnceADay, mallTask.VisitFriendsOnceADay, nameof(CreditVisitOnceADay));
                 SetAndNotify(ref _lastCreditVisitFriendsTime, mallTask.VisitFriendsLastTime, nameof(LastCreditVisitFriendsTime));
             }
-            else if (task is RoguelikeTask roguelikeTask)
+            else if (task is RecruitTask recruit)
             {
-                _roguelikeTheme = roguelikeTask.Theme;
-
-                NotifyOfPropertyChange(nameof(RoguelikeTheme));
+                SetAndNotify(ref _recruitUseExpedited, recruit.UseExpedited, nameof(RecruitUseExpedited));
+                SetAndNotify(ref _recruitMaxTimes, recruit.MaxTimes, nameof(RecruitMaxTimes));
+                SetAndNotify(ref _forceRefresh, recruit.ForceRefresh, nameof(ForceRefresh));
+                SetAndNotify(ref _notChooseLevel1, recruit.NotChooseLevel1, nameof(NotChooseLevel1));
+                SetAndNotify(ref _chooseLevel3, recruit.ChooseLevel3, nameof(ChooseLevel3));
+                SetAndNotify(ref _chooseLevel4, recruit.ChooseLevel4, nameof(ChooseLevel4));
+                SetAndNotify(ref _chooseLevel5, recruit.ChooseLevel5, nameof(ChooseLevel5));
+                SetAndNotify(ref _isLevel3UseShortTime, recruit.Level3Time0740, nameof(IsLevel3UseShortTime));
+                SetAndNotify(ref _isLevel3UseShortTime2, recruit.Level3Time0100, nameof(IsLevel3UseShortTime2));
+                SetAndNotify(ref _refreshLevel3, recruit.RefreshLevel3, nameof(RefreshLevel3));
+                SetAndNotify(ref _autoRecruitFirstList, recruit.Level3FirstTags, nameof(AutoRecruitFirstList));
+                SetAndNotify(ref _selectExtraTags, recruit.ExtraTagStrategy, nameof(SelectExtraTags));
             }
 
             /*
@@ -3420,14 +3429,29 @@ namespace MaaWpfGui.ViewModels.UI
         /// <summary>
         /// Gets the list of auto recruit selecting extra tags.
         /// </summary>
-        public List<CombinedData> AutoRecruitSelectExtraTagsList { get; } =
+        public List<GenericCombinedData<int>> AutoRecruitSelectExtraTagsList { get; } =
             [
-                new() { Display = LocalizationHelper.GetString("DefaultNoExtraTags"), Value = "0" },
-                new() { Display = LocalizationHelper.GetString("SelectExtraTags"), Value = "1" },
-                new() { Display = LocalizationHelper.GetString("SelectExtraOnlyRareTags"), Value = "2" },
+                new() { Display = LocalizationHelper.GetString("DefaultNoExtraTags"), Value = 0 },
+                new() { Display = LocalizationHelper.GetString("SelectExtraTags"), Value = 1 },
+                new() { Display = LocalizationHelper.GetString("SelectExtraOnlyRareTags"), Value = 2 },
             ];
 
-        private string _autoRecruitFirstList = ConfigurationHelper.GetValue(ConfigurationKeys.AutoRecruitFirstList, string.Empty);
+        private int _selectExtraTags;
+
+        /// <summary>
+        /// Gets or sets a value indicating three tags are always selected or select only rare tags as many as possible .
+        /// </summary>
+        public int SelectExtraTags
+        {
+            get => _selectExtraTags;
+            set
+            {
+                SetAndNotify(ref _selectExtraTags, value);
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).ExtraTagStrategy = value;
+            }
+        }
+
+        private string _autoRecruitFirstList;
 
         /// <summary>
         /// Gets or sets the priority tag list of level-3 tags.
@@ -3438,26 +3462,26 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _autoRecruitFirstList, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.AutoRecruitFirstList, value);
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Level3FirstTags = value;
             }
         }
 
-        private string _recruitMaxTimes = ConfigurationHelper.GetValue(ConfigurationKeys.RecruitMaxTimes, "4");
+        private int _recruitMaxTimes;
 
         /// <summary>
         /// Gets or sets the maximum times of recruit.
         /// </summary>
-        public string RecruitMaxTimes
+        public int RecruitMaxTimes
         {
             get => _recruitMaxTimes;
             set
             {
                 SetAndNotify(ref _recruitMaxTimes, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RecruitMaxTimes, value);
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).MaxTimes = value;
             }
         }
 
-        private bool _refreshLevel3 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RefreshLevel3, bool.TrueString));
+        private bool _refreshLevel3;
 
         /// <summary>
         /// Gets or sets a value indicating whether to refresh level 3.
@@ -3468,11 +3492,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _refreshLevel3, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RefreshLevel3, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).RefreshLevel3 = value;
             }
         }
 
-        private bool _forceRefresh = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.ForceRefresh, bool.TrueString));
+        private bool _forceRefresh;
 
         /// <summary>
         /// Gets or Sets a value indicating whether to refresh when recruit permit ran out.
@@ -3483,54 +3507,26 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _forceRefresh, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.ForceRefresh, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).ForceRefresh = value;
             }
         }
 
-        private bool _useExpedited;
+        private bool _recruitUseExpedited;
 
         /// <summary>
         /// Gets or sets a value indicating whether to use expedited.
         /// </summary>
-        public bool UseExpedited
+        public bool RecruitUseExpedited
         {
-            get => _useExpedited;
-            set => SetAndNotify(ref _useExpedited, value);
-        }
-
-        private string _selectExtraTags = ConfigurationHelper.GetValue(ConfigurationKeys.SelectExtraTags, "0");
-
-        /// <summary>
-        /// Gets or sets a value indicating three tags are always selected or select only rare tags as many as possible .
-        /// </summary>
-        public string SelectExtraTags
-        {
-            get
-            {
-                if (int.TryParse(_selectExtraTags, out _))
-                {
-                    return _selectExtraTags;
-                }
-
-                var value = "0";
-                if (bool.TryParse(_selectExtraTags, out bool boolValue))
-                {
-                    value = boolValue ? "1" : "0";
-                }
-
-                SetAndNotify(ref _selectExtraTags, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.SelectExtraTags, value);
-                return value;
-            }
-
+            get => _recruitUseExpedited;
             set
             {
-                SetAndNotify(ref _selectExtraTags, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.SelectExtraTags, value);
+                SetAndNotify(ref _recruitUseExpedited, value);
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).UseExpedited = value;
             }
         }
 
-        private bool _isLevel3UseShortTime = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.IsLevel3UseShortTime, bool.FalseString));
+        private bool _isLevel3UseShortTime;
 
         /// <summary>
         /// Gets or sets a value indicating whether to shorten the time for level 3.
@@ -3546,11 +3542,11 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 SetAndNotify(ref _isLevel3UseShortTime, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.IsLevel3UseShortTime, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Level3Time0740 = value;
             }
         }
 
-        private bool _isLevel3UseShortTime2 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.IsLevel3UseShortTime2, bool.FalseString));
+        private bool _isLevel3UseShortTime2;
 
         /// <summary>
         /// Gets or sets a value indicating whether to shorten the time for level 3.
@@ -3566,11 +3562,11 @@ namespace MaaWpfGui.ViewModels.UI
                 }
 
                 SetAndNotify(ref _isLevel3UseShortTime2, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.IsLevel3UseShortTime2, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).Level3Time0100 = value;
             }
         }
 
-        private bool _notChooseLevel1 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.NotChooseLevel1, bool.TrueString));
+        private bool _notChooseLevel1;
 
         /// <summary>
         /// Gets or sets a value indicating whether not to choose level 1.
@@ -3581,11 +3577,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _notChooseLevel1, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.NotChooseLevel1, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).NotChooseLevel1 = value;
             }
         }
 
-        private bool _chooseLevel3 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RecruitChooseLevel3, bool.TrueString));
+        private bool _chooseLevel3;
 
         /// <summary>
         /// Gets or sets a value indicating whether to choose level 3.
@@ -3596,11 +3592,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _chooseLevel3, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RecruitChooseLevel3, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).ChooseLevel3 = value;
             }
         }
 
-        private bool _chooseLevel4 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RecruitChooseLevel4, bool.TrueString));
+        private bool _chooseLevel4;
 
         /// <summary>
         /// Gets or sets a value indicating whether to choose level 4.
@@ -3611,11 +3607,11 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _chooseLevel4, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RecruitChooseLevel4, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).ChooseLevel4 = value;
             }
         }
 
-        private bool _chooseLevel5 = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.RecruitChooseLevel5, bool.FalseString));
+        private bool _chooseLevel5;
 
         /// <summary>
         /// Gets or sets a value indicating whether to choose level 5.
@@ -3626,7 +3622,7 @@ namespace MaaWpfGui.ViewModels.UI
             set
             {
                 SetAndNotify(ref _chooseLevel5, value);
-                ConfigurationHelper.SetValue(ConfigurationKeys.RecruitChooseLevel5, value.ToString());
+                ((RecruitTask)ConfigFactory.CurrentConfig.TaskQueue[TaskSettingVisibilities.CurrentIndex]).ChooseLevel5 = value;
             }
         }
 

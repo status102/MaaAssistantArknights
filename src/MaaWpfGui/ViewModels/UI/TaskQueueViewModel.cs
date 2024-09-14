@@ -1605,11 +1605,6 @@ namespace MaaWpfGui.ViewModels.UI
         private static bool AppendRecruit()
         {
             // for debug
-            if (!int.TryParse(Instances.SettingsViewModel.RecruitMaxTimes, out var maxTimes))
-            {
-                maxTimes = 0;
-            }
-
             var firstList = Instances.SettingsViewModel.AutoRecruitFirstList.Split(';', '；')
                 .Select(s => s.Trim());
 
@@ -1634,17 +1629,15 @@ namespace MaaWpfGui.ViewModels.UI
                 cfmList.Add(5);
             }
 
-            _ = int.TryParse(Instances.SettingsViewModel.SelectExtraTags, out var selectExtra);
-
             return Instances.AsstProxy.AsstAppendRecruit(
-                maxTimes,
+                Instances.SettingsViewModel.RecruitMaxTimes,
                 firstList.ToArray(),
                 [.. reqList],
                 [.. cfmList],
                 Instances.SettingsViewModel.RefreshLevel3,
                 Instances.SettingsViewModel.ForceRefresh,
-                Instances.SettingsViewModel.UseExpedited,
-                selectExtra,
+                Instances.SettingsViewModel.RecruitUseExpedited,
+                Instances.SettingsViewModel.SelectExtraTags,
                 Instances.SettingsViewModel.NotChooseLevel1,
                 Instances.SettingsViewModel.IsLevel3UseShortTime,
                 Instances.SettingsViewModel.IsLevel3UseShortTime2);
