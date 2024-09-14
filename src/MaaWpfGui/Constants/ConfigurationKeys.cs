@@ -150,7 +150,7 @@ namespace MaaWpfGui.Constants
         public const string AutoRecruitFirstList = "AutoRecruit.AutoRecruitFirstList"; // 迁移
         public const string RefreshLevel3 = "AutoRecruit.RefreshLevel3"; // 迁移
         public const string ForceRefresh = "AutoRecruit.ForceRefresh"; // 迁移
-        public const string SelectExtraTags = "AutoRecruit.SelectExtraTags";
+        public const string SelectExtraTags = "AutoRecruit.SelectExtraTags"; // 迁移
         public const string IsLevel3UseShortTime = "AutoRecruit.IsLevel3UseShortTime"; // 迁移
         public const string IsLevel3UseShortTime2 = "AutoRecruit.IsLevel3UseShortTime2"; // 迁移
         public const string NotChooseLevel1 = "AutoRecruit.NotChooseLevel1"; // 迁移
