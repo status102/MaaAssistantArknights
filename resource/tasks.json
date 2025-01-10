@@ -2293,11 +2293,6 @@
         "action": "DoNothing",
         "next": ["AccountManager"]
     },
-    "AccountManager": {
-        "action": "ClickSelf",
-        "roi": [855, 660, 150, 40],
-        "next": ["LoginOther"]
-    },
     "LoginOther": {
         "algorithm": "JustReturn",
         "preDelay": 3000,
