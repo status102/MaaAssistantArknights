@@ -23,6 +23,148 @@ asst::DebugTask::DebugTask(const AsstCallback& callback, Assistant* inst) :
 
 bool asst::DebugTask::run()
 {
+    auto image_base = MaaNS::imread(
+        utils::path("D:\\My_Program\\Arknights\\MaaAssistantArknights\\tools\\ImageRegistration") / "a.png");
+    auto image_tilted = MaaNS::imread(
+        utils::path("D:\\My_Program\\Arknights\\MaaAssistantArknights\\tools\\ImageRegistration") / "b.png");
+
+    // 定义 ROI 区域
+    cv::Rect roi(140, 80, 910, 500);
+    // 裁剪并转换为灰度图
+    cv::Mat image_base_gray, image_tilted_gray;
+    cv::cvtColor(image_base(roi), image_base_gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(image_tilted(roi), image_tilted_gray, cv::COLOR_BGR2GRAY);
+
+    std::vector<cv::KeyPoint> kp_base, kp_tilted;
+
+    auto start_time = std::chrono::steady_clock::now();
+
+    for (int i = 0; i < 50; i++) {
+        // 创建 SIFT 特征检测器
+        // auto detector = cv::SIFT::create();
+        auto detector = cv::SIFT::create();
+
+        // 检测特征点和描述符
+        // std::vector<cv::KeyPoint> kp_base, kp_tilted;
+        cv::Mat desc_base, desc_tilted;
+        detector->detectAndCompute(image_base_gray, cv::noArray(), kp_base, desc_base);
+        detector->detectAndCompute(image_tilted_gray, cv::noArray(), kp_tilted, desc_tilted);
+
+        if (desc_base.empty() || desc_tilted.empty()) {
+            Log.error(__FUNCTION__, "未检测到足够的特征点");
+            return false;
+        }
+
+        // 特征匹配 (使用 BFMatcher 和 KNN)
+        cv::BFMatcher matcher(cv::NORM_L2, false);
+        std::vector<std::vector<cv::DMatch>> knn_matches;
+        matcher.knnMatch(desc_base, desc_tilted, knn_matches, 2);
+
+        // 应用比率测试筛选好的匹配
+        std::vector<cv::DMatch> good_matches;
+        for (const auto& match_pair : knn_matches) {
+            if (match_pair.size() == 2) {
+                if (match_pair[0].distance < 0.75 * match_pair[1].distance) {
+                    good_matches.push_back(match_pair[0]);
+                }
+            }
+        }
+
+        if (good_matches.size() < 4) {
+            Log.error(__FUNCTION__, "匹配点数量不足:", good_matches.size());
+            return false;
+        }
+
+        // 提取匹配点的坐标并调整到原图坐标系
+        std::vector<cv::Point2f> pts_base, pts_tilted;
+        for (const auto& match : good_matches) {
+            cv::Point2f pt_base = kp_base[match.queryIdx].pt;
+            cv::Point2f pt_tilted = kp_tilted[match.trainIdx].pt;
+
+            // 调整到原图坐标系
+            pts_base.push_back(cv::Point2f(pt_base.x + roi.x, pt_base.y + roi.y));
+            pts_tilted.push_back(cv::Point2f(pt_tilted.x + roi.x, pt_tilted.y + roi.y));
+        }
+
+        // 计算单应性矩阵 (从 base 到 tilted 的变换)
+        cv::Mat mask;
+        cv::Mat homography = cv::findHomography(pts_base, pts_tilted, cv::RANSAC, 5.0, mask);
+
+        if (homography.empty()) {
+            Log.error(__FUNCTION__, "无法计算变换矩阵");
+            return false;
+        }
+        // 统计内点数量
+        int inliers = cv::countNonZero(mask);
+        Log.info(__FUNCTION__, "匹配成功:", good_matches.size(), "个匹配点,", inliers, "个内点");
+        Log.info(__FUNCTION__, "变换矩阵:\n", homography);
+    }
+
+    auto costs =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+    LogInfo << __FUNCTION__ << costs << "平均每次配准耗时:" << costs / 50.0 << "ms";
+    /*
+    // 可视化匹配结果
+    std::vector<cv::DMatch> inlier_matches;
+    for (size_t i = 0; i < good_matches.size(); ++i) {
+        if (mask.at<uchar>(static_cast<int>(i))) {
+            inlier_matches.push_back(good_matches[i]);
+        }
+    }
+
+    cv::Mat match_img;
+    cv::drawMatches(
+        image_base_gray,
+        kp_base,
+        image_tilted_gray,
+        kp_tilted,
+        inlier_matches,
+        match_img,
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(255, 0, 0),
+        std::vector<char>(),
+        cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+    // 添加文字信息
+    cv::putText(
+        match_img,
+        "Total Matches: " + std::to_string(good_matches.size()),
+        cv::Point(10, 30),
+        cv::FONT_HERSHEY_SIMPLEX,
+        0.8,
+        cv::Scalar(255, 255, 255),
+        2);
+    cv::putText(
+        match_img,
+        "Inliers: " + std::to_string(inliers),
+        cv::Point(10, 60),
+        cv::FONT_HERSHEY_SIMPLEX,
+        0.8,
+        cv::Scalar(0, 255, 0),
+        2);
+
+    // 保存匹配可视化结果
+    MaaNS::imwrite(
+        utils::path("D:\\My_Program\\Arknights\\MaaAssistantArknights\\tools\\ImageRegistration") / "matches.png",
+        match_img);
+
+    // 应用变换矩阵进行配准
+    cv::Mat warped_base, warped_tilted;
+    cv::warpPerspective(image_base, warped_base, homography, image_tilted.size());
+    cv::warpPerspective(image_tilted, warped_tilted, homography.inv(), image_base.size());
+
+    // 保存配准结果
+    MaaNS::imwrite(
+        utils::path("D:\\My_Program\\Arknights\\MaaAssistantArknights\\tools\\ImageRegistration") /
+            "warped_result_a.png",
+        warped_base);
+    MaaNS::imwrite(
+        utils::path("D:\\My_Program\\Arknights\\MaaAssistantArknights\\tools\\ImageRegistration") /
+            "warped_result_b.png",
+        warped_tilted);
+        */
+    Log.info(__FUNCTION__, "配准完成，结果已保存");
+
     return true;
 }
 
