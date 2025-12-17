@@ -1,3 +1,7 @@
+# Enable C++20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 file(GLOB_RECURSE maa_src *.h *.hpp *.cpp)
 
 add_library(MaaCore SHARED ${maa_src})
@@ -16,6 +20,35 @@ target_compile_definitions(MaaCore PRIVATE ASST_WITH_EMULATOR_EXTRAS=$<BOOL:${WI
 target_include_directories(MaaCore PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE .)
 add_dependencies(MaaCore MaaUtils)
 target_link_libraries(MaaCore HeaderOnlyLibraries MaaUtils ${OpenCV_LIBS} fastdeploy_ppocr ONNXRuntime::ONNXRuntime ZLIB::ZLIB Boost::system)
+
+# 添加 OpenMP 支持
+if(APPLE)
+    # Try to find libomp from Homebrew
+    find_library(OMP_LIBRARY
+        NAMES omp
+        PATHS /opt/homebrew/opt/libomp/lib /usr/local/opt/libomp/lib
+        NO_DEFAULT_PATH
+    )
+    if(OMP_LIBRARY)
+        message(STATUS "Found libomp: ${OMP_LIBRARY}")
+        # 获取库的根目录
+        get_filename_component(OMP_LIB_DIR "${OMP_LIBRARY}" DIRECTORY)
+        get_filename_component(OMP_ROOT_DIR "${OMP_LIB_DIR}" DIRECTORY)
+        
+        target_compile_options(MaaCore PRIVATE -Xpreprocessor -fopenmp)
+        target_include_directories(MaaCore PRIVATE "${OMP_ROOT_DIR}/include")
+        target_link_libraries(MaaCore "${OMP_LIBRARY}")
+    else()
+        message(FATAL_ERROR "OpenMP not found! Please install: brew install libomp")
+    endif()
+elseif(UNIX)
+    target_compile_options(MaaCore PRIVATE -fopenmp)
+    target_link_libraries(MaaCore -fopenmp)
+elseif(WIN32)
+    # Windows MSVC: 使用内置的 OpenMP
+    target_compile_options(MaaCore PRIVATE /openmp)
+endif()
+
 
 if(WIN32)
     target_link_libraries(MaaCore ws2_32)

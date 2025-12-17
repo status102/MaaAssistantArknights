@@ -71,6 +71,10 @@ jobs:
         run: |
           git submodule update --init --depth 1 src/MaaUtils
 
+      - name: Install dependencies
+        run: |
+          brew install libomp
+          
       - name: Cache MaaDeps
         if: steps.smoke-cache.outputs.cache-hit != 'true'
         id: maadeps-cache

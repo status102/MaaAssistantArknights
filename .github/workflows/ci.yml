@@ -245,6 +245,11 @@ jobs:
         run: |
           python3 tools/maadeps-download.py ${{ matrix.arch == 'x86_64' && 'x64' || 'arm64' }}-linux
 
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libomp-dev
+
       - name: Config cmake
         run: |
           mkdir -p build
@@ -348,6 +353,10 @@ jobs:
       - name: Fetch submodules
         run: |
           git submodule update --init --depth 1 src/MaaUtils
+
+      - name: Install dependencies
+        run: |
+          brew install libomp
 
       # ninja 1.13.1 is already installed and up-to-date.
       # - name: Install dependencies

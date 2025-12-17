@@ -2,6 +2,7 @@
 
 #include <array>
 #include <filesystem>
+#include <omp.h>
 #include <string_view>
 
 #include "MaaUtils/ImageIo.h"
